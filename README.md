@@ -33,7 +33,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 }
 ```
 
-The first paramater of `mixinPropertiesAttributes` is the base class that you want to extend.
+The first paramater of `mixinPropertiesAttributes` is the `base` class that you want to extend.
 
 The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside Polymer and other libraries. It defaults to `'properties'` (which is what Polymer uses).
 
@@ -66,9 +66,9 @@ Property/Attribute Configuration Options:
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
 
-For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` is converted to an empty string `''`, and all other data types are converted by `''+value`.
+For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
 
-For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` is converted to the number `0`, and all other data types are converted by `Number(value)`.
+For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`.
 
 For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
@@ -87,11 +87,11 @@ All events fired when the `notify` option is specified, will have the above prop
 Upon construction, an optional options object can be passed to `super()` to configure this mixin.
 
 | Property | Description (when specified) |
-|-|-|-|
+|-|-|
 | `protectedProperties` | An array of properties/attributes that are 'protected', meaning there can not be properties/attributes specified as such. |
 | `propertyStore` | An object which stores the values for the properties/attributes. |
 | `onPropertySet` | A callback which is called on any property/attribute change. The first/only paramater is the same as the above `observer` property configure option.` |
-| `superArguments` | An array of arguments/paramaters passed to the `base` constructor. |
+| `superArguments` | An array of arguments/paramaters passed to the `base` class constructor. |
 
 An example use case for `onPropertySet`, where you can do your own logic for your own property configure options:
 
@@ -105,7 +105,7 @@ constructor() {
 }
 ```
 
-## Examples
+## Example
 
 Javascript Module:
 
@@ -176,6 +176,8 @@ HTML:
 ```html
 <example-hello name="Developer"></example-hello>
 ```
+
+Freely change the `name` attribute in your browser developer tools and watch the property and redered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
 
 ## Contributors
 
