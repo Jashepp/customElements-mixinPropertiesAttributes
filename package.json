@@ -1,0 +1,12 @@
+{
+  "name": "ce-mixinprops",
+  "version": "0.0.1",
+  "description": "Mixin for Custom Elements (Web Components) to handle/sync properties and attributes",
+  "main": "index.js",
+  "author": "unchosen.aus@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Unchosen/customElements-mixinPropertiesAttributes"
+  }
+}
