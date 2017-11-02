@@ -17,7 +17,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(type===Boolean) newValue = (newValue!==null);
 			else if(type===Number) newValue = Number(newValue);
 		} 
-		if(this[name]!==newValue) this[name] = newValue;
+		this[name] = newValue;
 	}
 	
 	constructor({ protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] }={}) {
