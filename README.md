@@ -21,9 +21,14 @@ Install  via [NPM][npm-url]
 ```
 npm install ce-mixinprops --save
 ```
+
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
 
 ## How To Use / API
+
+### mixinPropertiesAttributes()
+
+Usage: `mixinPropertiesAttributes(base,[propertiesName='properties'])`
 
 Simply import this module and call the `mixinPropertiesAttributes` method while extending `HTMLElement` (or any class that already extends it).
 
@@ -37,6 +42,8 @@ The first paramater of `mixinPropertiesAttributes` is the `base` class that you 
 
 The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside Polymer and other libraries. It defaults to `'properties'` (which is what Polymer uses).
 
+### Property/Attribute Configuration
+
 Within your class, have the following:
 ```js
 static get properties() {
@@ -46,14 +53,13 @@ static get properties() {
 			value: 'World',
 			reflectToAttribute: true,
 			reflectFromAttribute: true
-		}
+		},
+		// addional properties with configs
 	};
 }
 ```
 
 All property/attribute names are case sensitive. All options are optional.
-
-Property/Attribute Configuration Options:
 
 | Property | Description (when `true` or specified) | Default Value |
 |-|-|-|
@@ -72,6 +78,8 @@ For `Number` types, the mixin tries to keep the property as a number. `Null` and
 
 For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
+For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
+
 For the `observer` option, one paramater/argument is provided which has the following properties:
 
 | Property | Description |
@@ -83,6 +91,8 @@ For the `observer` option, one paramater/argument is provided which has the foll
 | `oldValue` | The old value. |
 
 All events fired when the `notify` option is specified, will have the above properties set on the event.`detail` object.
+
+### Mixin Configuration
 
 Upon construction, an optional options object can be passed to `super()` to configure this mixin.
 
@@ -125,7 +135,7 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 			name: {
 				type: String,
 				value: 'World',
-				renderOnChange: true // Re-render when property or attribute is changed (logic is below in constructor)
+				renderOnChange: true // Re-render on change (logic is below in constructor)
 			}
 		};
 	}
@@ -177,7 +187,7 @@ HTML:
 <example-hello name="Developer"></example-hello>
 ```
 
-Freely change the `name` attribute in your browser developer tools and watch the property and redered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
+Freely change the `name` attribute in your browser developer tools and watch the property and rendered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
 
 ## Contributors
 
