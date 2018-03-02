@@ -199,7 +199,7 @@ All the help is appreciated.
 
 MIT License
 
-Copyright (c) 2017 Jason Sheppard @ https://github.com/Unchosen
+Copyright (c) 2018 Jason Sheppard @ https://github.com/Jashepp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -221,14 +221,14 @@ SOFTWARE.
 
 ## Links
 
-Github Repository: [https://github.com/Unchosen/customElements-mixinPropertiesAttributes][github-url]
+Github Repository: [https://github.com/Jashepp/customElements-mixinPropertiesAttributes][github-url]
 
 NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 
-[github-url]: https://github.com/Unchosen/customElements-mixinPropertiesAttributes
-[github-branch]: https://github.com/Unchosen/customElements-mixinPropertiesAttributes/tree/master
-[github-releases]: https://github.com/Unchosen/customElements-mixinPropertiesAttributes/releases
-[github-tags]: https://github.com/Unchosen/customElements-mixinPropertiesAttributes/tags
+[github-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
+[github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tree/master
+[github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
+[github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
 [npm-image]: https://img.shields.io/npm/v/ce-mixinprops.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/ce-mixinprops
 [npm-downloads]: https://img.shields.io/npm/dm/ce-mixinprops.svg?style=flat-square
