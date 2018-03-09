@@ -2,27 +2,46 @@
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
+		let propsLower = [];
 		return this[propertiesName] ? Object.keys(this[propertiesName]).filter(prop=>{
 			if(this[propertiesName][prop].readOnly) return false;
 			let type = this[propertiesName][prop].type;
 			let safeAttributeType = type===String || type===Number || type===Boolean;
-			return 'reflectFromAttribute' in this[propertiesName][prop] ? this[propertiesName][prop].reflectFromAttribute : safeAttributeType;
-		}) : [];
+			let observe = 'reflectFromAttribute' in this[propertiesName][prop] ? this[propertiesName][prop].reflectFromAttribute : safeAttributeType;
+			if(observe){
+				let propLower = prop.toLowerCase();
+				if(propLower!==prop) propsLower.push(propLower);
+			}
+			return observe;
+		}).concat(propsLower) : [];
 	}
 	
 	attributeChangedCallback(name,oldValue,newValue){
 		if(oldValue===newValue) return;
+		if(!(name in this.constructor[propertiesName])){
+			let props = Object.keys(this.constructor[propertiesName]);
+			for(let i=0,l=props.length; i<l; i++){
+				if(props[i].toLowerCase()===name){
+					name = props[i];
+					break;
+				}
+			}
+		}
 		if(name in this.constructor[propertiesName]){
 			let type = this.constructor[propertiesName][name].type;
 			if(type===Boolean) newValue = (newValue!==null);
 			else if(type===Number) newValue = Number(newValue);
-		} 
-		this[name] = newValue;
+			this[name] = newValue;
+		}
 	}
 	
 	constructor({ protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] }={}) {
 		super(...superArguments);
 		let element = this, propsConfig = element.constructor[propertiesName] || {};
+		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
+		for(let i=0,l=propsLower.length; i<l; i++){
+			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
+		}
 		let protoTree = [], checkObj = null;
 		while(true){
 			checkObj = Object.getPrototypeOf(checkObj===null?element:checkObj);

@@ -59,7 +59,7 @@ static get properties() {
 }
 ```
 
-All property/attribute names are case sensitive. All options are optional.
+Properties **are** case sensitive, and attributes are **not** case sensitive (due to how attributes work). There cannot be duplicate properties with different cases. All options are optional. 
 
 | Property | Description (when `true` or specified) | Default Value |
 |-|-|-|
