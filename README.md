@@ -24,6 +24,70 @@ npm install ce-mixinprops --save
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
 
+## Example
+
+Javascript Module:
+
+Using [lit-html](https://github.com/PolymerLabs/lit-html) as the renderer.
+
+```js
+// Before running this example, install and specify the correct import paths
+import { html, render as litRender } from 'lit-html/lit-html.js';
+import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
+
+export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
+	
+	static get is() { return 'example-hello'; }
+	
+	static get properties() {
+		return {
+			name: {
+				type: String,
+				value: 'World',
+				observer: 'renderNow'
+			}
+		};
+	}
+	
+	constructor() {
+		super();
+		this.attachShadow({ mode:'open' });
+	}
+	
+	render() {
+		return html`
+			<style type="text/css">:host { display: block; }</style>
+			<span>Hello, ${this.name}!</span>
+		`;
+	}
+	
+	renderNow(){
+		litRender(this.render(), this.shadowRoot||this);
+	}
+	
+	connectedCallback() {
+		this.renderNow();
+	}
+	
+}
+
+customElements.define(exampleHello.is,exampleHello);
+```
+
+HTML:
+
+```html
+<example-hello name="Developer"></example-hello>
+```
+
+Rendered Result:
+
+```
+Hello, Developer!
+```
+
+Freely change the `name` attribute in your browser developer tools and watch the property and rendered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
+
 ## How To Use / API
 
 ### mixinPropertiesAttributes()
@@ -46,16 +110,20 @@ The second paramater is an optional string which lets you specify the name of th
 
 Within your class, have the following:
 ```js
-static get properties() {
-	return {
-		propName: {
-			type: String,
-			value: 'World',
-			reflectToAttribute: true,
-			reflectFromAttribute: true
-		},
-		// addional properties with configs
-	};
+class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
+	// ...
+	static get properties() {
+		return {
+			propName: {
+				type: String,
+				value: 'World',
+				reflectToAttribute: true,
+				reflectFromAttribute: true
+			},
+			// additional properties with configs
+		};
+	}
+	// ...
 }
 ```
 
@@ -106,88 +174,42 @@ Upon construction, an optional options object can be passed to `super()` to conf
 An example use case for `onPropertySet`, where you can do your own logic for your own property configure options:
 
 ```js
-constructor() {
-	super({
-		onPropertySet: ({ element,name,config,newValue,oldValue })=>{
-			if(config.renderOnChange) element.queueToRender();
-		}
-	});
-}
-```
-
-## Example
-
-Javascript Module:
-
-Using [lit-html](https://github.com/PolymerLabs/lit-html) as the renderer.
-
-```js
-// Before running this example, install and specify the correct import paths
-import { html, render as litRender } from 'lit-html/lit-html.js';
-import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
-
-export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
-	
-	static get is() { return 'example-hello'; }
-	
-	static get properties() {
-		return {
-			name: {
-				type: String,
-				value: 'World',
-				renderOnChange: true // Re-render on change (logic is below in constructor)
-			}
-		};
-	}
-	
-	render() {
-		return html`
-			<style> :host { display: block; } </style>
-			<span>Hello, ${this.name}!</span>
-		`;
-	}
-	
+class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
+	// ...
 	constructor() {
 		super({
-			protectedProperties: ['_invalidated','_firstConnectedCallback'],
 			onPropertySet: ({ element,name,config,newValue,oldValue })=>{
-				if(config.renderOnChange) element.invalidate();
+				if(config.renderOnChange) element.queueToRender();
 			}
 		});
-		this.attachShadow({ mode:'open' });
 	}
-	
-	connectedCallback() {
-		if(!this._firstConnectedCallback){
-			this.invalidate();
-			this._firstConnectedCallback = true;
-		}
-	}
-	
-	renderNow(){
-		litRender(this.render(), this.shadowRoot||this);
-	}
-	
-	async invalidate() {
-		if (!this._invalidated) {
-			this._invalidated = true;
-			await 0;
-			this._invalidated = false;
-			this.renderNow();
-		}
-	}
-	
+	// ...
 }
-customElements.define(exampleHello.is,exampleHello);
 ```
 
-HTML:
+### Existing Properties
 
-```html
-<example-hello name="Developer"></example-hello>
+An error will be thrown upon mixin construction if it detects duplicate properties, unless the `overrideExisting` option is specified.
+
+### Watching For Changes
+
+A simple way to listen for changes to a property is to have a `set` descriptor (`setter`) for that specific property. The alternative is to use the `observer` or `notify` options on the property config, or `onPropertySet` on the mixin config.
+
+```js
+class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
+	// ...
+	set myPropertyName(newValue){
+		console.log('myPropertyName has changed:',newValue);
+	}
+	// ...
+}
 ```
 
-Freely change the `name` attribute in your browser developer tools and watch the property and rendered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
+Changing the property within the `set` descriptor (`setter`) function may cause a call stack overflow, so be careful!
+
+This feature only works if there is no `get` descriptor (`getter`) for that same property, unless the `overrideExisting` option is specified, which will remove the `get` descriptor.
+
+There is no error handling or catching for functions/callbacks/events triggered by changes, so if an error occurs, it may effect the mixin's `set` code and further functions/callbacks/events (if multiple specified) will not fire.
 
 ## Contributors
 

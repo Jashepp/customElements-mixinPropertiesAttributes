@@ -56,7 +56,13 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let propExists = false, protoPath = [];
 				for(checkObj of protoTree){
 					if(checkObj.constructor) protoPath.push(checkObj.constructor.name);
-					if(checkObj.hasOwnProperty(name)){ propExists = true; break; }
+					if(checkObj.hasOwnProperty(name)){
+						let descriptor = Object.getOwnPropertyDescriptor(checkObj,name);
+						if(!descriptor || !descriptor.set || !descriptor.configurable || descriptor.get){
+							propExists = true;
+							break;
+						}
+					}
 				}
 				if(propExists) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It already exists on ${protoPath.join('=>')}.`);
 			}
@@ -73,45 +79,74 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
 				let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
 				let reflectFromAttribute = 'reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean);
-				Object.defineProperty(element,name,{
-					enumerable: true,
-					configurable: true,
-					get(){
-						if(propertyStore.hasOwnProperty(name)) return propertyStore[name];
-						if(reflectFromAttribute){
-							let hasAttribute = element.hasAttribute(name);
-							if(isBoolean) return propertyStore[name] = hasAttribute;
-							if(hasAttribute && isNumber) return propertyStore[name] = Number(element.getAttribute(name));
-							if(hasAttribute) return propertyStore[name] = element.getAttribute(name);
-						}
-						return config.value;
-					},
-					set(newValue){
-						if(isBoolean) newValue = !!newValue;
-						else if(isNumber) newValue = newValue===null || newValue===void 0 ? 0 : Number(newValue);
-						else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
-						let oldValue = element[name];
-						if(oldValue===newValue) return;
-						propertyStore[name] = newValue;
-						if(reflectToAttribute){
-							if(isBoolean){
-								let hasAttribute = element.hasAttribute(name);
-								if(!newValue && hasAttribute) element.removeAttribute(name);
-								if(newValue && !hasAttribute) element.setAttribute(name,'');
-							}
-							else element.setAttribute(name,newValue);
-						}
-						if(onPropertySet || hasObserver || config.notify){
-							let detailObj = { element,name,config,newValue,oldValue };
-							if(onPropertySet) onPropertySet(detailObj);
-							if(hasObserver && isObserverString) element[config.observer](detailObj);
-							else if(hasObserver) config.observer(detailObj);
-							if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj }));
-						}
-					}
-				});
+				let descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element),name);
+				Object.defineProperty(element,name,new mixinPropsElementSyncer({
+					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, descriptor
+				}));
 			}
 		}
 	}
 	
 };
+
+class mixinPropsElementSyncer {
+	
+	constructor(props){
+		this.enumerable = true;
+		this.configurable = true;
+		this.props = Object.assign({},props);
+		this.get = this.get.bind(this);
+		this.set = this.set.bind(this);
+	}
+	
+	get(){
+		let { propertyStore, element, name, config, reflectFromAttribute, isBoolean, isNumber, descriptor } = this.props;
+		if(propertyStore.hasOwnProperty(name)) return propertyStore[name];
+		if(reflectFromAttribute){
+			let hasAttribute = element.hasAttribute(name);
+			if(isBoolean) return propertyStore[name] = hasAttribute;
+			if(hasAttribute && isNumber) return propertyStore[name] = Number(element.getAttribute(name));
+			if(hasAttribute) return propertyStore[name] = element.getAttribute(name);
+		}
+		return config.value;
+	}
+	
+	set(newValue){
+		let { propertyStore, element, name, config, reflectToAttribute, isBoolean, isNumber, isString, onPropertySet, hasObserver, isObserverString, descriptor } = this.props;
+		if(isBoolean) newValue = !!newValue;
+		else if(isNumber) newValue = newValue===null || newValue===void 0 ? 0 : Number(newValue);
+		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
+		let oldValue = element[name];
+		if(oldValue===newValue) return;
+		propertyStore[name] = newValue;
+		if(reflectToAttribute){
+			if(isBoolean){
+				let hasAttribute = element.hasAttribute(name);
+				if(!newValue && hasAttribute) element.removeAttribute(name);
+				if(newValue && !hasAttribute) element.setAttribute(name,'');
+			}
+			else element.setAttribute(name,newValue);
+		}
+		if(onPropertySet || hasObserver || config.notify){
+			let detailObj = new mixinPropsSetDetails(element,name,config,newValue,oldValue);
+			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
+			if(hasObserver && isObserverString) element[config.observer].apply(element,[detailObj]);
+			else if(hasObserver) config.observer.apply(element,[detailObj]);
+			if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj }));
+		}
+		if(descriptor && descriptor.set) descriptor.set.apply(element,[newValue]);
+	}
+	
+}
+
+class mixinPropsSetDetails {
+	
+	constructor(element,name,config,newValue,oldValue){
+		this.element = element;
+		this.name = name;
+		this.config = config;
+		this.newValue = newValue;
+		this.oldValue = oldValue;
+	}
+	
+}
