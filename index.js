@@ -1,25 +1,69 @@
 
+const getConstructorTree = function(topClass){
+	let protoTree = [], parentClass = null;
+	while(true){
+		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
+		if(!parentClass || !parentClass.constructor || parentClass.constructor===HTMLElement || parentClass.constructor===Function || parentClass.constructor===Object || parentClass.constructor===parentClass.constructor.constructor) break;
+		protoTree.push(parentClass);
+	}
+	return protoTree;
+}
+
+const getProtoTree = function(topClass){
+	let protoTree = [], parentClass = null;
+	while(true){
+		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
+		if(!parentClass || parentClass===HTMLElement || parentClass===Function || parentClass===Object || parentClass===parentClass.constructor) break;
+		protoTree.push(parentClass);
+	}
+	return protoTree;
+}
+
+const buildProtoPropsConfig = function(topClass,propertiesName,protoTree){
+	let propsConfig = {};
+	for(let parentClass of [...protoTree].reverse()){
+		if(parentClass.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass[propertiesName]);
+	}
+	return propsConfig;
+};
+
+const buildConstructorPropsConfig = function(topClass,propertiesName,protoTree){
+	let propsConfig = {};
+	for(let parentClass of [...protoTree].reverse()){
+		if(parentClass.constructor.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass.constructor[propertiesName]);
+	}
+	return propsConfig;
+};
+
+const freezeConstructorPropsConfigs = function(topClass,propertiesName,protoTree){
+	for(let parentClass of protoTree){
+		if(parentClass.constructor.hasOwnProperty(propertiesName)) Object.freeze(parentClass.constructor[propertiesName]);
+	}
+}
+
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
 		let propsLower = [];
-		return this[propertiesName] ? Object.keys(this[propertiesName]).filter(prop=>{
-			if(this[propertiesName][prop].readOnly) return false;
-			let type = this[propertiesName][prop].type;
+		let propsConfig = buildProtoPropsConfig(this,propertiesName,getProtoTree(this));
+		return Object.keys(propsConfig).filter(prop=>{
+			if(propsConfig[prop].readOnly) return false;
+			let type = propsConfig[prop].type;
 			let safeAttributeType = type===String || type===Number || type===Boolean;
-			let observe = 'reflectFromAttribute' in this[propertiesName][prop] ? this[propertiesName][prop].reflectFromAttribute : safeAttributeType;
+			let observe = 'reflectFromAttribute' in propsConfig[prop] ? propsConfig[prop].reflectFromAttribute : safeAttributeType;
 			if(observe){
 				let propLower = prop.toLowerCase();
 				if(propLower!==prop) propsLower.push(propLower);
 			}
 			return observe;
-		}).concat(propsLower) : [];
+		}).concat(propsLower);
 	}
 	
 	attributeChangedCallback(name,oldValue,newValue){
 		if(oldValue===newValue) return;
-		if(!(name in this.constructor[propertiesName])){
-			let props = Object.keys(this.constructor[propertiesName]);
+		let propsConfig = buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
+		if(!(name in propsConfig)){
+			let props = Object.keys(propsConfig);
 			for(let i=0,l=props.length; i<l; i++){
 				if(props[i].toLowerCase()===name){
 					name = props[i];
@@ -27,8 +71,8 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				}
 			}
 		}
-		if(name in this.constructor[propertiesName]){
-			let type = this.constructor[propertiesName][name].type;
+		if(name in propsConfig){
+			let type = propsConfig[name].type;
 			if(type===Boolean) newValue = (newValue!==null);
 			else if(type===Number) newValue = Number(newValue);
 			this[name] = newValue;
@@ -37,27 +81,23 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	
 	constructor({ protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] }={}) {
 		super(...superArguments);
-		let element = this, propsConfig = element.constructor[propertiesName] || {};
+		let element = this, topClass = Object.getPrototypeOf(this);
+		let protoTree = getConstructorTree(topClass);
+		let propsConfig = buildConstructorPropsConfig(topClass,propertiesName,protoTree);
+		freezeConstructorPropsConfigs(topClass,propertiesName,protoTree);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
-		let protoTree = [], checkObj = null;
-		while(true){
-			checkObj = Object.getPrototypeOf(checkObj===null?element:checkObj);
-			if(!checkObj || !checkObj.constructor || checkObj.constructor===HTMLElement || checkObj.constructor===Function || checkObj.constructor===Object || checkObj.constructor===checkObj.constructor.constructor) break;
-			protoTree.push(checkObj);
-		}
-		Object.freeze(propsConfig);
 		for(let name in propsConfig){
 			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It is a protected property.`);
 			let config = Object.freeze(propsConfig[name]);
 			if(config.overrideExisting!==true){
 				let propExists = false, protoPath = [];
-				for(checkObj of protoTree){
-					if(checkObj.constructor) protoPath.push(checkObj.constructor.name);
-					if(checkObj.hasOwnProperty(name)){
-						let descriptor = Object.getOwnPropertyDescriptor(checkObj,name);
+				for(let parentClass of protoTree){
+					if(parentClass.constructor) protoPath.push(parentClass.constructor.name);
+					if(parentClass.hasOwnProperty(name)){
+						let descriptor = Object.getOwnPropertyDescriptor(parentClass,name);
 						if(!descriptor || !descriptor.set || !descriptor.configurable || descriptor.get){
 							propExists = true;
 							break;
@@ -79,7 +119,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
 				let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
 				let reflectFromAttribute = 'reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean);
-				let descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element),name);
+				let descriptor = Object.getOwnPropertyDescriptor(topClass,name);
 				Object.defineProperty(element,name,new mixinPropsElementSyncer({
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, descriptor
 				}));

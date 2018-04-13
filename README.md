@@ -211,6 +211,10 @@ This feature only works if there is no `get` descriptor (`getter`) for that same
 
 There is no error handling or catching for functions/callbacks/events triggered by changes, so if an error occurs, it may effect the mixin's `set` code and further functions/callbacks/events (if multiple specified) will not fire.
 
+### Extending Classes
+
+It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign). Properties & configurations on parent classes are overridden by classes which extend them.
+
 ## Contributors
 
 Create issues or pull requests on the GitHub project.
