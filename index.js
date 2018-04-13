@@ -135,6 +135,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
 				let reflectFromAttribute = 'reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean);
 				let descriptor = Object.getOwnPropertyDescriptor(topClass,name);
+				if(reflectToAttribute && reflectFromAttribute){
+					if(isBoolean && config.value && !element.hasAttribute(name)) element.setAttribute(name,'');
+					if(isString && config.value!==void 0 && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
+					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
+				}
 				Object.defineProperty(element,name,new mixinPropsElementSyncer({
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, descriptor
 				}));
