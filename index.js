@@ -169,7 +169,7 @@ class mixinPropsElementSyncer {
 	set(newValue){
 		let { propertyStore, element, name, config, reflectToAttribute, isBoolean, isNumber, isString, onPropertySet, hasObserver, isObserverString, descriptor } = this.props;
 		if(isBoolean) newValue = !!newValue;
-		else if(isNumber) newValue = newValue===null || newValue===void 0 ? 0 : Number(newValue);
+		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
 		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
 		let oldValue = element[name];
 		if(oldValue===newValue) return;
