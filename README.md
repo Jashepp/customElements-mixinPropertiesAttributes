@@ -148,7 +148,13 @@ For `Boolean` types, the mixin tries to keep the property as a boolean. All data
 
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
 
-For the `observer` option, one paramater/argument is provided which has the following properties:
+If the both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
+
+For the `observer` option, the _Property Change Details Object_ will be the first argument.
+
+All events fired when the `notify` option is specified, will have `event.detail` set to the _Property Change Details Object_.
+
+#### Property Change Details Object
 
 | Property | Description |
 |-|-|
@@ -158,8 +164,6 @@ For the `observer` option, one paramater/argument is provided which has the foll
 | `newValue` | The new value. |
 | `oldValue` | The old value. |
 
-All events fired when the `notify` option is specified, will have the above properties set on the event.`detail` object.
-
 ### Mixin Configuration
 
 Upon construction, an optional options object can be passed to `super()` to configure this mixin.
@@ -168,7 +172,7 @@ Upon construction, an optional options object can be passed to `super()` to conf
 |-|-|
 | `protectedProperties` | An array of properties/attributes that are 'protected', meaning there can not be properties/attributes specified as such. |
 | `propertyStore` | An object which stores the values for the properties/attributes. |
-| `onPropertySet` | A callback which is called on any property/attribute change. The first/only paramater is the same as the above `observer` property configure option.` |
+| `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the _Property Change Details Object_. |
 | `superArguments` | An array of arguments/paramaters passed to the `base` class constructor. |
 
 An example use case for `onPropertySet`, where you can do your own logic for your own property configure options:

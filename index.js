@@ -128,6 +128,8 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					writable: false,
 					value: config.value
 				});
+				let reflectToAttribute = 'reflectToAttribute' in config && config.reflectToAttribute;
+				if(reflectToAttribute && (!element.hasAttribute(name) || element.getAttribute(name)+''!==''+config.value)) element.setAttribute(name,''+config.value);
 			}
 			else {
 				let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
