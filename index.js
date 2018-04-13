@@ -1,3 +1,13 @@
+/**
+ * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
+ * 
+ * MIT License
+ * Copyright (c) 2018 Jason Sheppard
+ * 
+ * See README.md for more information.
+ * NPM: https://npmjs.org/package/ce-mixinprops
+ * Github: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
+ */
 
 const getConstructorTree = function(topClass){
 	let protoTree = [], parentClass = null;
@@ -41,6 +51,11 @@ const freezeConstructorPropsConfigs = function(topClass,propertiesName,protoTree
 	}
 }
 
+/**
+ * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
+ * @param HTMLElement base class to apply mixin to
+ * @param String propertiesName Optional: 'static get' method name for configuration of properties. Default: 'properties'
+ */
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
