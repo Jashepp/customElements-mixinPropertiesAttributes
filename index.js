@@ -51,6 +51,8 @@ const freezeConstructorPropsConfigs = function(topClass,propertiesName,protoTree
 	}
 }
 
+const propsConfigWeakMap = WeakMap && new WeakMap();
+
 /**
  * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
  * @param HTMLElement base class to apply mixin to
@@ -76,7 +78,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	
 	attributeChangedCallback(name,oldValue,newValue){
 		if(oldValue===newValue) return;
-		let propsConfig = buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
+		let propsConfig = (propsConfigWeakMap && propsConfigWeakMap.get(this)) || buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
 		if(!(name in propsConfig)){
 			let props = Object.keys(propsConfig);
 			for(let i=0,l=props.length; i<l; i++){
@@ -99,6 +101,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		let element = this, topClass = Object.getPrototypeOf(this);
 		let protoTree = getConstructorTree(topClass);
 		let propsConfig = buildConstructorPropsConfig(topClass,propertiesName,protoTree);
+		if(propsConfigWeakMap) propsConfigWeakMap.set(this,propsConfig);
 		freezeConstructorPropsConfigs(topClass,propertiesName,protoTree);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
