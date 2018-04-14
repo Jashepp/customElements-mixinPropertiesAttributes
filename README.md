@@ -9,9 +9,9 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
 
-The mixin adds functionality to your web component to help javascript properties and DOM element attributes be synchronised where configured.
+The mixin adds functionality to your web component to help javascript properties and DOM element attributes be synchronised where configured. No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties.
 
-This was designed to help your web components follow the best practices mentioned on the [Google Developers Web Fundamentals Website](https://developers.google.com/web/fundamentals/web-components/customelements#properties_and_attributes). It is greatly inspired by Polymer's method of doing so.
+This was designed to help your web components follow the best practices mentioned on the [Google Developers Web Fundamentals Website](https://developers.google.com/web/fundamentals/web-components/customelements#properties_and_attributes).
 
 ## Installation
 
@@ -235,7 +235,7 @@ There is no error handling or catching for functions/callbacks/events triggered 
 
 ### Extending Classes
 
-It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign).
+It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign). All classes along the proto tree **must** have the same `static get properties()` method name.
 
 Properties & configurations on parent classes are overridden by classes which extend them. This means that if the parent class has `observer` or `notify` options set, **they may be overridden**.
 
