@@ -45,12 +45,6 @@ const buildConstructorPropsConfig = function(topClass,propertiesName,protoTree){
 	return propsConfig;
 };
 
-const freezeConstructorPropsConfigs = function(topClass,propertiesName,protoTree){
-	for(let parentClass of protoTree){
-		if(parentClass.constructor.hasOwnProperty(propertiesName)) Object.freeze(parentClass.constructor[propertiesName]);
-	}
-}
-
 const propsConfigWeakMap = WeakMap && new WeakMap();
 
 /**
@@ -102,7 +96,6 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		let protoTree = getConstructorTree(topClass);
 		let propsConfig = buildConstructorPropsConfig(topClass,propertiesName,protoTree);
 		if(propsConfigWeakMap) propsConfigWeakMap.set(this,propsConfig);
-		freezeConstructorPropsConfigs(topClass,propertiesName,protoTree);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
