@@ -17,9 +17,14 @@ This was designed to help your web components follow the best practices mentione
 
 Note: This project is written with new ECMAScript features such as ESM, arrow functions, object destructuring and etc. You may need to use a transpiler / bundling application to have this be compatible on older browsers.
 
-Install  via [NPM][npm-url]
+Install via [NPM][npm-url]
 ```
 npm install ce-mixinprops --save
+```
+
+Or use via `import` and unpkg.com
+```js
+import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops';
 ```
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
