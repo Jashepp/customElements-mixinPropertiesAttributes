@@ -39,14 +39,20 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 	
 	static get is() { return 'example-hello'; }
 	
+	// Properties & Configurations
 	static get properties() {
 		return {
 			name: {
 				type: String,
-				value: 'World',
-				observer: 'renderNow'
+				value: 'World'
 			}
 		};
+	}
+	
+	// On-change listener for 'name' property
+	set name(v){
+		// Render element content
+		this.renderNow();
 	}
 	
 	constructor() {
@@ -54,6 +60,7 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 		this.attachShadow({ mode:'open' });
 	}
 	
+	// Define element content via lit-html
 	render() {
 		return html`
 			<style type="text/css">:host { display: block; }</style>
@@ -61,10 +68,12 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 		`;
 	}
 	
+	// Render element to DOM
 	renderNow(){
 		litRender(this.render(), this.shadowRoot||this);
 	}
 	
+	// Render element upon DOM attachment
 	connectedCallback() {
 		this.renderNow();
 	}
@@ -164,6 +173,8 @@ All events fired when the `notify` option is specified, will have `event.detail`
 | `newValue` | The new value. |
 | `oldValue` | The old value. |
 
+It is recommended to use a `set` descriptor to listen for changes. See 'Watching For Changes' below.
+
 ### Mixin Configuration
 
 Upon construction, an optional options object can be passed to `super()` to configure this mixin.
@@ -197,7 +208,9 @@ An error will be thrown upon mixin construction if it detects duplicate properti
 
 ### Watching For Changes
 
-A simple way to listen for changes to a property is to have a `set` descriptor (`setter`) for that specific property. The alternative is to use the `observer` or `notify` options on the property config, or `onPropertySet` on the mixin config.
+The recommended way to listen for changes to a property is to have a `set` descriptor (`setter`) for that specific property.
+
+The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` consturctor option on the mixin config.
 
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
@@ -217,7 +230,11 @@ There is no error handling or catching for functions/callbacks/events triggered 
 
 ### Extending Classes
 
-It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign). Properties & configurations on parent classes are overridden by classes which extend them.
+It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign).
+
+Properties & configurations on parent classes are overridden by classes which extend them. This means that if the parent class has `observer` or `notify` options set, **they may be overridden**.
+
+However, a `set` descriptor (`setter`) will **not** be overridden and will fire upon property change for all classes in the proto tree where it is defined. They will fire in order from the top most parent class, down to the last extended class. It is done this way so parent logic is done first before extended logic.
 
 ## Contributors
 
