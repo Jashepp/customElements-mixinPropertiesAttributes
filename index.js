@@ -156,7 +156,7 @@ class mixinPropsElementSyncer {
 	constructor(props){
 		this.enumerable = true;
 		this.configurable = true;
-		this.props = Object.assign({},props);
+		this.props = props;
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
 	}
