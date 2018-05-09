@@ -22,9 +22,9 @@ Install via [NPM][npm-url]
 npm install ce-mixinprops --save
 ```
 
-Or use via `import` and unpkg.com
+Or use via `import` with a CDN
 ```js
-import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops';
+import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops
 ```
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
@@ -118,7 +118,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 The first paramater of `mixinPropertiesAttributes` is the `base` class that you want to extend.
 
-The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside Polymer and other libraries. It defaults to `'properties'` (which is what Polymer uses).
+The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside other libraries which don't use `static get observedAttributes()` and `attributeChangedCallback()` class methods.
 
 ### Property/Attribute Configuration
 
@@ -215,7 +215,7 @@ An error will be thrown upon mixin construction if it detects duplicate properti
 
 The recommended way to listen for changes to a property is to have a `set` descriptor (`setter`) for that specific property.
 
-The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` consturctor option on the mixin config.
+The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` constructor option on the mixin config.
 
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
