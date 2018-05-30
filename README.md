@@ -213,6 +213,8 @@ An error will be thrown upon mixin construction if it detects duplicate properti
 
 ### Watching For Changes
 
+Changes are emitted if the property or attribute (if reflectFromAttribute is true) has been changed. It can also emit shortly after construction if there is an attribute on the element that is different than the default property value.
+
 The recommended way to listen for changes to a property is to have a `set` descriptor (`setter`) for that specific property.
 
 The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` constructor option on the mixin config.

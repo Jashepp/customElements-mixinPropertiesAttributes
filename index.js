@@ -142,9 +142,15 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					if(isString && config.value!==void 0 && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
 					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
 				}
-				Object.defineProperty(element,name,new mixinPropsElementSyncer({
+				let elementSyncer = new mixinPropsElementSyncer({
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
-				}));
+				});
+				Object.defineProperty(element,name,elementSyncer);
+				if(config.value!==elementSyncer.getValueFromAttribute()){
+					Promise.resolve().then(()=>{
+						if(!elementSyncer.firstChangeEmitted) elementSyncer.emitChanges(config.value,elementSyncer.get())
+					});
+				}
 			}
 		}
 	}
@@ -159,22 +165,29 @@ class mixinPropsElementSyncer {
 		this.props = props;
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
+		this.firstChangeEmitted = false;
 	}
 	
 	get(){
 		let { propertyStore, element, name, config, reflectFromAttribute, isBoolean, isNumber } = this.props;
 		if(propertyStore.hasOwnProperty(name)) return propertyStore[name];
 		if(reflectFromAttribute){
-			let hasAttribute = element.hasAttribute(name);
-			if(isBoolean) return propertyStore[name] = hasAttribute;
-			if(hasAttribute && isNumber) return propertyStore[name] = Number(element.getAttribute(name));
-			if(hasAttribute) return propertyStore[name] = element.getAttribute(name);
+			let value = this.getValueFromAttribute();
+			if(value!==void 0) return propertyStore[name] = value;
 		}
 		return config.value;
 	}
 	
+	getValueFromAttribute(){
+		let { element, name, isBoolean, isNumber } = this.props;
+		let hasAttribute = element.hasAttribute(name);
+		if(isBoolean) return hasAttribute;
+		if(hasAttribute && isNumber) return Number(element.getAttribute(name));
+		if(hasAttribute) return element.getAttribute(name);
+	}
+	
 	set(newValue){
-		let { propertyStore, element, name, config, reflectToAttribute, isBoolean, isNumber, isString, onPropertySet, hasObserver, isObserverString, setDescriptors } = this.props;
+		let { propertyStore, element, name, reflectToAttribute, isBoolean, isNumber, isString } = this.props;
 		if(isBoolean) newValue = !!newValue;
 		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
 		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
@@ -189,6 +202,12 @@ class mixinPropsElementSyncer {
 			}
 			else element.setAttribute(name,newValue);
 		}
+		this.emitChanges(oldValue,newValue);
+	}
+	
+	emitChanges(oldValue,newValue){
+		let { element, name, config, onPropertySet, hasObserver, isObserverString, setDescriptors } = this.props;
+		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || config.notify){
 			let detailObj = new mixinPropsSetDetails(element,name,config,newValue,oldValue);
 			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
