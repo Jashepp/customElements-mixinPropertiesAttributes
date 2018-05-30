@@ -146,7 +146,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 				});
 				Object.defineProperty(element,name,elementSyncer);
-				if(config.value!==elementSyncer.getValueFromAttribute()){
+				if(reflectFromAttribute && config.value!==elementSyncer.getValueFromAttribute()){
 					Promise.resolve().then(()=>{
 						if(!elementSyncer.firstChangeEmitted) elementSyncer.emitChanges(config.value,elementSyncer.get())
 					});
