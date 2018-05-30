@@ -9,7 +9,7 @@
  * Github: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
  */
 
-const getConstructorTree = function(topClass){
+const getConstructorTree = (topClass)=>{
 	let protoTree = [], parentClass = null;
 	while(true){
 		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
@@ -19,7 +19,7 @@ const getConstructorTree = function(topClass){
 	return protoTree;
 }
 
-const getProtoTree = function(topClass){
+const getProtoTree = (topClass)=>{
 	let protoTree = [], parentClass = null;
 	while(true){
 		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
@@ -29,7 +29,7 @@ const getProtoTree = function(topClass){
 	return protoTree;
 }
 
-const buildProtoPropsConfig = function(topClass,propertiesName,protoTree){
+const buildProtoPropsConfig = (topClass,propertiesName,protoTree)=>{
 	let propsConfig = {};
 	for(let parentClass of [...protoTree].reverse()){
 		if(parentClass.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass[propertiesName]);
@@ -37,7 +37,7 @@ const buildProtoPropsConfig = function(topClass,propertiesName,protoTree){
 	return propsConfig;
 };
 
-const buildConstructorPropsConfig = function(topClass,propertiesName,protoTree){
+const buildConstructorPropsConfig = (topClass,propertiesName,protoTree)=>{
 	let propsConfig = {};
 	for(let parentClass of [...protoTree].reverse()){
 		if(parentClass.constructor.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass.constructor[propertiesName]);
