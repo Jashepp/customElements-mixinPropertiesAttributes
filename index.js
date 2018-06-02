@@ -142,13 +142,13 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					if(isString && config.value!==void 0 && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
 					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
 				}
-				let elementSyncer = new mixinPropsElementSyncer({
+				let eProp = new elementProperty({
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 				});
-				Object.defineProperty(element,name,elementSyncer);
-				if(reflectFromAttribute && config.value!==elementSyncer.getValueFromAttribute()){
+				Object.defineProperty(element,name,eProp);
+				if(reflectFromAttribute && config.value!==eProp.getValueFromAttribute()){
 					Promise.resolve().then(()=>{
-						if(!elementSyncer.firstChangeEmitted) elementSyncer.emitChanges(config.value,elementSyncer.get());
+						if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());
 					});
 				}
 			}
@@ -157,7 +157,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	
 };
 
-class mixinPropsElementSyncer {
+class elementProperty {
 	
 	constructor(props){
 		this.enumerable = true;
@@ -202,14 +202,14 @@ class mixinPropsElementSyncer {
 			}
 			else element.setAttribute(name,newValue);
 		}
-		this.emitChanges(oldValue,newValue);
+		this.emitChange(oldValue,newValue);
 	}
 	
-	emitChanges(oldValue,newValue){
+	emitChange(oldValue,newValue){
 		let { element, name, config, onPropertySet, hasObserver, isObserverString, setDescriptors } = this.props;
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || config.notify){
-			let detailObj = new mixinPropsSetDetails(element,name,config,newValue,oldValue);
+			let detailObj = new propertyChangeDetails(element,name,config,newValue,oldValue);
 			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
 			if(hasObserver && isObserverString) element[config.observer].apply(element,[detailObj]);
 			else if(hasObserver) config.observer.apply(element,[detailObj]);
@@ -220,7 +220,7 @@ class mixinPropsElementSyncer {
 	
 }
 
-class mixinPropsSetDetails {
+class propertyChangeDetails {
 	
 	constructor(element,name,config,newValue,oldValue){
 		this.element = element;
