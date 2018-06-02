@@ -236,7 +236,7 @@ class elementProperty {
 			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
 			if(hasObserver && isObserverString) element[config.observer].apply(element,[detailObj]);
 			else if(hasObserver) config.observer.apply(element,[detailObj]);
-			if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj }));
+			if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj, bubbles:false }));
 		}
 		for(let i=0,l=setDescriptors.length; i<l; i++) setDescriptors[i].apply(element,[newValue]);
 	}
