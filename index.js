@@ -61,7 +61,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(propsConfig[prop].readOnly) return false;
 			let type = propsConfig[prop].type;
 			let safeAttributeType = type===String || type===Number || type===Boolean;
-			let observe = 'reflectFromAttribute' in propsConfig[prop] ? propsConfig[prop].reflectFromAttribute : safeAttributeType;
+			let observe = 'reflectFromAttribute' in propsConfig[prop] ? !!propsConfig[prop].reflectFromAttribute : safeAttributeType;
 			if(observe){
 				let propLower = prop.toLowerCase();
 				if(propLower!==prop) propsLower.push(propLower);
@@ -83,10 +83,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			}
 		}
 		if(name in propsConfig){
-			let type = propsConfig[name].type;
+			let config = propsConfig[name], type = config.type;
 			if(type===Boolean) newValue = newValue!==null;
 			else if(type===Number) newValue = Number(newValue);
 			else if(type===String) newValue = newValue===null ? '' : ''+newValue;
+			else if('reflectFromAttribute' in config && typeof config.reflectFromAttribute==='function') newValue = config.reflectFromAttribute.apply(this,[newValue]);
 			this[name] = newValue;
 		}
 	}
@@ -133,6 +134,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
 				let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
 				let reflectFromAttribute = 'reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean);
+				let transformToAttribute = !isString && !isNumber && !isBoolean && typeof reflectToAttribute==='function' ? reflectToAttribute : null;
+				let transformFromAttribute = !isString && !isNumber && !isBoolean && typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
+				reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
 				let setDescriptors = [];
 				for(let classObj of protoTree){
 					let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
@@ -142,9 +146,14 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					if(isBoolean && config.value && !element.hasAttribute(name)) element.setAttribute(name,'');
 					if(isString && config.value!==void 0 && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
 					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
+					if(transformToAttribute){
+						let transformedValue = transformToAttribute.apply(element,[config.value]);
+						if(transformedValue===null) element.removeAttribute(name);
+						else element.setAttribute(name,transformedValue);
+					}
 				}
 				let eProp = new elementProperty({
-					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
+					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 				});
 				Object.defineProperty(element,name,eProp);
 				if(reflectFromAttribute && config.value!==eProp.getValueFromAttribute()){
@@ -167,6 +176,7 @@ class elementProperty {
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
 		this.firstChangeEmitted = false;
+		this.transformingFromAttribute = false;
 	}
 	
 	get(){
@@ -180,15 +190,22 @@ class elementProperty {
 	}
 	
 	getValueFromAttribute(){
-		let { element, name, isBoolean, isNumber } = this.props;
+		let { element, name, isBoolean, isNumber, transformFromAttribute } = this.props;
 		let hasAttribute = element.hasAttribute(name);
 		if(isBoolean) return hasAttribute;
 		if(hasAttribute && isNumber) return Number(element.getAttribute(name));
+		if(transformFromAttribute){
+			if(this.transformingFromAttribute) return;
+			this.transformingFromAttribute = true;
+			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(name) : null]);
+			this.transformingFromAttribute = false;
+			return transformedValue;
+		}
 		if(hasAttribute) return element.getAttribute(name);
 	}
 	
 	set(newValue){
-		let { propertyStore, element, name, reflectToAttribute, isBoolean, isNumber, isString } = this.props;
+		let { propertyStore, element, name, reflectToAttribute, transformToAttribute, isBoolean, isNumber, isString } = this.props;
 		if(isBoolean) newValue = !!newValue;
 		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
 		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
@@ -200,6 +217,11 @@ class elementProperty {
 				let hasAttribute = element.hasAttribute(name);
 				if(!newValue && hasAttribute) element.removeAttribute(name);
 				if(newValue && !hasAttribute) element.setAttribute(name,'');
+			}
+			else if(transformToAttribute){
+				let transformedValue = transformToAttribute.apply(element,[newValue]);
+				if(transformedValue===null) element.removeAttribute(name);
+				else element.setAttribute(name,transformedValue);
 			}
 			else element.setAttribute(name,newValue);
 		}

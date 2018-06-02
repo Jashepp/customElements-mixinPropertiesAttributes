@@ -147,8 +147,10 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 |-|-|-|
 | `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | - |
 | `value` | The default value of the property/attribute. | - |
-| `reflectToAttribute` | Sync changes on property to the attribute. | Automatic |
-| `reflectFromAttribute` | Sync changes on the attribute to the property. | Automatic |
+| `reflectToAttribute` | `true`: Sync changes on property to the attribute. | Automatic |
+| `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be set or valid). | - |
+| `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
+| `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be set or valid). | - |
 | `observer` | A class method name (String) or an actual callback (Function) which is fired upon change. See below for passed paramaters. | - |
 | `notify` | Fires a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
@@ -161,6 +163,8 @@ For `Number` types, the mixin tries to keep the property as a number. `Null` and
 For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
+
+If no valid `type` is specified and `reflectToAttribute` is a `function`, then the value is transformed (via the callback) before being set as the attribute. The same goes for `reflectFromAttribute` if it's a `function`; instead the value is transformed (via the callback) after being read from the attribute, before being set as the property. The transform functions take one argument (the initial value), and the `this` keyword is the element. If the returned value is undefined, the configured default value will be used. If the returned value is null, the attribute will be removed.
 
 If the both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
