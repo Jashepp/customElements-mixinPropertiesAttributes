@@ -84,8 +84,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		}
 		if(name in propsConfig){
 			let type = propsConfig[name].type;
-			if(type===Boolean) newValue = (newValue!==null);
+			if(type===Boolean) newValue = newValue!==null;
 			else if(type===Number) newValue = Number(newValue);
+			else if(type===String) newValue = newValue===null ? '' : ''+newValue;
 			this[name] = newValue;
 		}
 	}
