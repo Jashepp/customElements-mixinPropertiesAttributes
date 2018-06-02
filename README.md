@@ -7,9 +7,11 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 ## What is this?
 
-This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
+This class mixin adds functionality to your web component (custom element) to help javascript properties and DOM element attributes be synchronised where configured. This allows for data-binding from both attributes and properties for a web component.
 
-The mixin adds functionality to your web component to help javascript properties and DOM element attributes be synchronised where configured. No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties.
+No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
+
+This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
 
 This was designed to help your web components follow the best practices mentioned on the [Google Developers Web Fundamentals Website](https://developers.google.com/web/fundamentals/web-components/customelements#properties_and_attributes).
 
@@ -168,9 +170,9 @@ If no valid `type` is specified and `reflectToAttribute` is a `function`, then t
 
 If the both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
-For the `observer` option, the _Property Change Details Object_ will be the first argument.
+For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
-All events fired when the `notify` option is specified, will have `event.detail` set to the _Property Change Details Object_.
+All events fired when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object).
 
 #### Property Change Details Object
 
@@ -192,7 +194,7 @@ Upon construction, an optional options object can be passed to `super()` to conf
 |-|-|
 | `protectedProperties` | An array of properties/attributes that are 'protected', meaning there can not be properties/attributes specified as such. |
 | `propertyStore` | An object which stores the values for the properties/attributes. |
-| `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the _Property Change Details Object_. |
+| `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the [Property Change Details Object](#property-change-details-object). |
 | `superArguments` | An array of arguments/paramaters passed to the `base` class constructor. |
 
 An example use case for `onPropertySet`, where you can do your own logic for your own property configure options:
