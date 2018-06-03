@@ -7,7 +7,7 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 ## What is this?
 
-This class mixin adds functionality to your web component (custom element) to help javascript properties and DOM element attributes be synchronised where configured. This allows for data-binding from both attributes and properties for a web component.
+This class mixin adds functionality to your web component (custom element) to help javascript properties and DOM element attributes be synchronised/reflected where configured. This allows for data-binding from both attributes and properties for a web component.
 
 No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
 
@@ -248,6 +248,24 @@ It is possible to have properties configured on a class (like the above examples
 Properties & configurations on parent classes are overridden by classes which extend them. This means that if the parent class has `observer` or `notify` options set, **they may be overridden**.
 
 However, a `set` descriptor (`setter`) will **not** be overridden and will fire upon property change for all classes in the proto tree where it is defined. They will fire in order from the top most parent class, down to the last extended class. It is done this way so parent logic is done first before extended logic.
+
+When extending and you want to use `observedAttributes` or `attributeChangedCallback`, be sure to use `super`. For example:
+
+```js
+class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
+	// ...
+	static get observedAttributes() {
+		let attributes = ['your','list','of','attributes','in','lowercase'];
+		return (super.observedAttributes||[]).concat(attributes);
+	}
+	
+	attributeChangedCallback(name,oldValue,newValue){
+		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
+		// your logic
+	}
+	// ...
+}
+```
 
 ## Contributors
 

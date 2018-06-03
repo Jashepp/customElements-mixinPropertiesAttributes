@@ -55,8 +55,7 @@ const propsConfigWeakMap = WeakMap && new WeakMap();
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
-		let propsLower = [];
-		let propsConfig = buildProtoPropsConfig(this,propertiesName,getProtoTree(this));
+		let propsLower = [], propsConfig = buildProtoPropsConfig(this,propertiesName,getProtoTree(this));
 		return Object.keys(propsConfig).filter(prop=>{
 			if(propsConfig[prop].readOnly) return false;
 			let type = propsConfig[prop].type;
@@ -67,10 +66,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				if(propLower!==prop) propsLower.push(propLower);
 			}
 			return observe;
-		}).concat(propsLower);
+		}).concat(propsLower,super.observedAttributes || []);
 	}
 	
 	attributeChangedCallback(name,oldValue,newValue){
+		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
 		if(oldValue===newValue) return;
 		let propsConfig = (propsConfigWeakMap && propsConfigWeakMap.get(this)) || buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
 		if(!(name in propsConfig)){
