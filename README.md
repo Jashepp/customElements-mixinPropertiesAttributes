@@ -31,7 +31,71 @@ import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops'; // 
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
 
-## Example
+## Example 1
+
+Javascript Module:
+
+Simple display toggle.
+
+```js
+// Before running this example, install and specify the correct import paths
+import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
+
+export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
+	
+	static get properties() {
+		return {
+			show: {
+				type: Boolean,
+				value: true
+			},
+			hide: {
+				type: Boolean,
+				value: false
+			}
+		};
+	}
+	
+	// Toggle .style.display between none and previous value
+	set show(show){
+		if(show) this.style.display = this._previousDisplay;
+		else {
+			this._previousDisplay = this.style.display || '';
+			if(this._previousDisplay==='none') this._previousDisplay = '';
+			this.style.display = 'none';
+		}
+		this.hide = !show;
+	}
+	
+	set hide(hide){
+		this.show = !hide;
+	}
+	
+	constructor() {
+		super();
+		this._previousDisplay = this.style.display || '';
+	}
+	
+}
+
+customElements.define('example-toggle',exampleToggle);
+```
+
+HTML: (the `show` attribute will be set upon construction due to the default configured value above)
+
+```html
+Hello, <example-toggle>Beautiful</example-toggle> World!
+```
+
+Rendered Result:
+
+```
+Hello, Beautiful World!
+```
+
+Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change. Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.
+
+## Example 2
 
 Javascript Module:
 
