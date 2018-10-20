@@ -45,7 +45,7 @@ const buildConstructorPropsConfig = (topClass,propertiesName,protoTree)=>{
 	return propsConfig;
 };
 
-const propsConfigWeakMap = WeakMap && new WeakMap();
+const propsConfigWeakMap = new WeakMap();
 
 /**
  * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
@@ -72,7 +72,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	attributeChangedCallback(name,oldValue,newValue){
 		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
 		if(oldValue===newValue) return;
-		let propsConfig = (propsConfigWeakMap && propsConfigWeakMap.get(this)) || buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
+		let propsConfig = propsConfigWeakMap.get(this) || buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
 		if(!(name in propsConfig)){
 			let props = Object.keys(propsConfig);
 			for(let i=0,l=props.length; i<l; i++){
@@ -97,7 +97,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		let element = this, topClass = Object.getPrototypeOf(this);
 		let protoTree = getConstructorTree(topClass);
 		let propsConfig = buildConstructorPropsConfig(topClass,propertiesName,protoTree);
-		if(propsConfigWeakMap) propsConfigWeakMap.set(this,propsConfig);
+		propsConfigWeakMap.set(this,propsConfig);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
