@@ -144,7 +144,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				}
 				if(reflectToAttribute && reflectFromAttribute){
 					if(isBoolean && config.value && !element.hasAttribute(name)) element.setAttribute(name,'');
-					if(isString && config.value!==void 0 && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
+					if(isString && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
 					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
 					if(transformToAttribute){
 						let transformedValue = transformToAttribute.apply(element,[config.value]);
