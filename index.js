@@ -209,7 +209,7 @@ class elementProperty {
 		if(isBoolean) newValue = !!newValue;
 		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
 		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
-		let inPropStore = name in propertyStore;
+		let inPropStore = propertyStore.hasOwnProperty(name);
 		let oldValue = element[name];
 		if(oldValue===newValue && inPropStore) return;
 		propertyStore[name] = newValue;
