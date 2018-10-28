@@ -213,7 +213,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 |-|-|-|
 | `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | - |
 | `value` | The default value of the property/attribute. | - |
-| `reflectToAttribute` | `true`: Sync changes on property to the attribute. | Automatic |
+| `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
 | `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be set or valid). | - |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
 | `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be set or valid). | - |
