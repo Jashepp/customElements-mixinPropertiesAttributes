@@ -9,6 +9,8 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 This class mixin adds functionality to your web component (custom element) to help javascript properties and DOM element attributes be synchronised/reflected where configured. This allows for data-binding from both attributes and properties for a web component.
 
+This is written with vanilla JavaScript. No external dependencies required.
+
 No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
 
 This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
@@ -41,8 +43,10 @@ Simple display toggle.
 // Before running this example, install and specify the correct import paths
 import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
 
+// Define a class with the mixin on HTMLElement (or a class that extends it)
 export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 	
+	// Define the behaviour/options of properties
 	static get properties() {
 		return {
 			show: {
@@ -78,6 +82,7 @@ export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 	
 }
 
+// Define a custom element name with the above class
 customElements.define('example-toggle',exampleToggle);
 ```
 
@@ -106,11 +111,13 @@ Using [lit-html](https://github.com/PolymerLabs/lit-html) as the renderer.
 import { html, render as litRender } from 'lit-html/lit-html.js';
 import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
 
+// Define a class with the mixin on HTMLElement (or a class that extends it)
 export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 	
+	// Element name (used with customElements.define below)
 	static get is() { return 'example-hello'; }
 	
-	// Properties & Configurations
+	// Define the behaviour/options of properties
 	static get properties() {
 		return {
 			name: {
@@ -128,6 +135,7 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 	
 	constructor() {
 		super();
+		// Use ShadowDOM (comment this to disable)
 		this.attachShadow({ mode:'open' });
 	}
 	
@@ -139,18 +147,19 @@ export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
 		`;
 	}
 	
-	// Render element to DOM
+	// Render element to ShadowDOM or DOM
 	renderNow(){
 		litRender(this.render(), this.shadowRoot||this);
 	}
 	
-	// Render element upon DOM attachment
+	// Render upon DOM attachment
 	connectedCallback() {
 		this.renderNow();
 	}
 	
 }
 
+// Define a custom element name with the above class
 customElements.define(exampleHello.is,exampleHello);
 ```
 
@@ -184,11 +193,11 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 The first paramater of `mixinPropertiesAttributes` is the `base` class that you want to extend.
 
-The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside other libraries which don't use `static get observedAttributes()` and `attributeChangedCallback()` class methods.
+The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside other libraries.
 
 ### Property/Attribute Configuration
 
-Within your class, have the following:
+Property definition example:
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
@@ -224,15 +233,15 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 
 For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
 
-For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`.
+For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`. Failed conversions may result with `NaN`.
 
 For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
 
-If no valid `type` is specified and `reflectToAttribute` is a `function`, then the value is transformed (via the callback) before being set as the attribute. The same goes for `reflectFromAttribute` if it's a `function`; instead the value is transformed (via the callback) after being read from the attribute, before being set as the property. The transform functions take one argument (the initial value), and the `this` keyword is the element. If the returned value is undefined, the configured default value will be used. If the returned value is null, the attribute will be removed.
+If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, while `type` is not specified, the attribute can be transformed. See [Attribute Transformation](#attribute-transformation).
 
-If the both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
+If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
@@ -249,6 +258,42 @@ All events fired when the `notify` option is specified, will have `event.detail`
 | `oldValue` | The old value. |
 
 It is recommended to use a `set` descriptor to listen for changes. See 'Watching For Changes' below.
+
+#### Attribute Transformation:
+
+If `type` is not specified, `reflectToAttribute` and `reflectFromAttribute` can be used as functions to transform the attribute before being set, or after being read.
+
+The transform callbacks take one argument (the value), with the `this` keyword as the element.
+
+On `reflectFromAttribute`, if the returned value is undefined, the configured default value will be used.
+
+On `reflectToAttribute`, if the returned value is null, the attribute will be removed.
+
+```js
+class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
+	// ...
+	static get properties() {
+		return {
+			propName: {
+				value: 'test',
+				// Remove prefixed _
+				reflectFromAttribute: function(val){
+					val = val===null ? '' : ''+val;
+					return val.substr(0,1)==='_' ? val.substr(1) : val;
+				},
+				// Add _ prefix
+				reflectToAttribute: function(val){
+					return '_'+val;
+				}
+			},
+			// additional properties with configs
+		};
+	}
+	// ...
+}
+```
+
+A flag is set internally during `reflectFromAttribute` so a `call stack overflow` will not happen if you `get` the same property value within the transform callback. The `get` will instead result with the *previous value* or the *default value* (if no previous value) for that property.
 
 ### Mixin Configuration
 
@@ -299,7 +344,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 }
 ```
 
-Changing the property within the `set` descriptor (`setter`) function may cause a call stack overflow, so be careful!
+Changing the property (to a different value) within the `set` descriptor (`setter`) function may cause a `call stack overflow`, so be careful!
 
 This feature only works if there is no `get` descriptor (`getter`) for that same property, unless the `overrideExisting` option is specified, which will remove the `get` descriptor.
 
@@ -330,6 +375,10 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 }
 ```
+
+## Tests
+
+Coming Soon
 
 ## Contributors
 
