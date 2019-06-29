@@ -209,7 +209,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 				reflectToAttribute: true,
 				reflectFromAttribute: true
 			},
-			// additional properties with configs
+			// Additional properties with configs
 		};
 	}
 	// ...
@@ -286,7 +286,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 					return '_'+val;
 				}
 			},
-			// additional properties with configs
+			// Additional properties with configs
 		};
 	}
 	// ...
@@ -314,6 +314,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	constructor() {
 		super({
 			onPropertySet: ({ element,name,config,newValue,oldValue })=>{
+				// Queue changes to render if specified in property config
 				if(config.renderOnChange) element.queueToRender();
 			}
 		});
@@ -334,6 +335,7 @@ The recommended way to listen for changes to a property is to have a `set` descr
 
 The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` constructor option on the mixin config.
 
+Setter Example:
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
@@ -364,13 +366,16 @@ When extending and you want to use `observedAttributes` or `attributeChangedCall
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 	static get observedAttributes() {
+		// Your logic
 		let attributes = ['your','list','of','attributes','in','lowercase'];
+		// Concat with super
 		return (super.observedAttributes||[]).concat(attributes);
 	}
 	
 	attributeChangedCallback(name,oldValue,newValue){
+		// Call super method
 		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
-		// your logic
+		// Your logic
 	}
 	// ...
 }
