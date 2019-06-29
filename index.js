@@ -29,7 +29,7 @@ const getProtoTree = (topClass)=>{
 	return protoTree;
 }
 
-const buildProtoPropsConfig = (topClass,propertiesName,protoTree)=>{
+const buildProtoPropsConfig = (propertiesName,protoTree)=>{
 	let propsConfig = {};
 	for(let parentClass of [...protoTree].reverse()){
 		if(parentClass.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass[propertiesName]);
@@ -37,7 +37,7 @@ const buildProtoPropsConfig = (topClass,propertiesName,protoTree)=>{
 	return propsConfig;
 };
 
-const buildConstructorPropsConfig = (topClass,propertiesName,protoTree)=>{
+const buildConstructorPropsConfig = (propertiesName,protoTree)=>{
 	let propsConfig = {};
 	for(let parentClass of [...protoTree].reverse()){
 		if(parentClass.constructor.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass.constructor[propertiesName]);
@@ -55,7 +55,7 @@ const propsConfigWeakMap = new WeakMap();
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
-		let propsLower = [], propsConfig = buildProtoPropsConfig(this,propertiesName,getProtoTree(this));
+		let propsLower = [], propsConfig = buildProtoPropsConfig(propertiesName,getProtoTree(this));
 		return Object.keys(propsConfig).filter(prop=>{
 			if(propsConfig[prop].readOnly) return false;
 			let type = propsConfig[prop].type;
@@ -72,7 +72,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	attributeChangedCallback(name,oldValue,newValue){
 		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
 		if(oldValue===newValue) return;
-		let propsConfig = propsConfigWeakMap.get(this) || buildConstructorPropsConfig(this,propertiesName,getConstructorTree(this));
+		let propsConfig = propsConfigWeakMap.get(this) || buildConstructorPropsConfig(propertiesName,getConstructorTree(this));
 		if(!(name in propsConfig)){
 			let props = Object.keys(propsConfig);
 			for(let i=0,l=props.length; i<l; i++){
@@ -94,9 +94,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	
 	constructor({ protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] }={}) {
 		super(...superArguments);
-		let element = this, topClass = Object.getPrototypeOf(this);
-		let protoTree = getConstructorTree(topClass);
-		let propsConfig = buildConstructorPropsConfig(topClass,propertiesName,protoTree);
+		let element = this;
+		let protoTree = getConstructorTree(Object.getPrototypeOf(this));
+		let propsConfig = buildConstructorPropsConfig(propertiesName,protoTree);
 		propsConfigWeakMap.set(this,propsConfig);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
