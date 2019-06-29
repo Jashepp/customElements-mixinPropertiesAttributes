@@ -204,15 +204,16 @@ class elementProperty {
 		if(hasAttribute) return element.getAttribute(name);
 	}
 	
-	set(newValue){
-		let { propertyStore, element, name, reflectToAttribute, transformToAttribute, isBoolean, isNumber, isString } = this.props;
+	transformNewRawValue(newValue){
+		let { isBoolean, isNumber, isString } = this.props;
 		if(isBoolean) newValue = !!newValue;
 		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
 		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
-		let inPropStore = propertyStore.hasOwnProperty(name);
-		let oldValue = element[name];
-		if(oldValue===newValue && inPropStore) return;
-		propertyStore[name] = newValue;
+		return newValue;
+	}
+	
+	reflectValueToAttribute(newValue){
+		let { element, name, reflectToAttribute, transformToAttribute, isBoolean } = this.props;
 		if(reflectToAttribute){
 			if(isBoolean){
 				let hasAttribute = element.hasAttribute(name);
@@ -226,6 +227,16 @@ class elementProperty {
 			}
 			else element.setAttribute(name,newValue);
 		}
+	}
+	
+	set(newValue){
+		let { propertyStore, element, name, reflectToAttribute } = this.props;
+		newValue = this.transformNewRawValue(newValue);
+		let inPropStore = propertyStore.hasOwnProperty(name);
+		let oldValue = element[name];
+		if(oldValue===newValue && inPropStore) return;
+		propertyStore[name] = newValue;
+		if(reflectToAttribute) this.reflectValueToAttribute(newValue);
 		this.emitChange(oldValue,newValue);
 	}
 	
