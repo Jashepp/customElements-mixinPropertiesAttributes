@@ -87,7 +87,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(type===Boolean) newValue = newValue!==null;
 			else if(type===Number) newValue = Number(newValue);
 			else if(type===String) newValue = newValue===null ? '' : ''+newValue;
-			else if('reflectFromAttribute' in config && typeof config.reflectFromAttribute==='function') newValue = config.reflectFromAttribute.apply(this,[newValue]);
+			else if(!config.readOnly && 'reflectFromAttribute' in config && typeof config.reflectFromAttribute==='function') newValue = config.reflectFromAttribute.apply(this,[newValue]);
 			this[name] = newValue;
 		}
 	}
@@ -104,7 +104,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		}
 		for(let name in propsConfig){
 			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It is a protected property.`);
-			let config = Object.freeze(propsConfig[name]);
+			let config = propsConfig[name];
 			if(config.overrideExisting!==true){
 				let propExists = false, protoPath = [];
 				for(let parentClass of protoTree){
@@ -119,43 +119,36 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				}
 				if(propExists) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It already exists on ${protoPath.join('=>')}.`);
 			}
-			if(config.readOnly){
-				Object.defineProperty(element,name,{
-					enumerable: true,
-					configurable: true,
-					writable: false,
-					value: config.value
-				});
-				let reflectToAttribute = 'reflectToAttribute' in config && config.reflectToAttribute;
-				if(reflectToAttribute && (!element.hasAttribute(name) || element.getAttribute(name)+''!==''+config.value)) element.setAttribute(name,''+config.value);
+			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
+			let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
+			let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
+			let reflectFromAttribute = !config.readOnly && ('reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean));
+			let transformToAttribute = !isString && !isNumber && !isBoolean && typeof reflectToAttribute==='function' ? reflectToAttribute : null;
+			let transformFromAttribute = !isString && !isNumber && !isBoolean && typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
+			reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
+			let setDescriptors = [];
+			for(let classObj of protoTree){
+				let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
+				if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 			}
-			else {
-				let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
-				let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
-				let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
-				let reflectFromAttribute = 'reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean);
-				let transformToAttribute = !isString && !isNumber && !isBoolean && typeof reflectToAttribute==='function' ? reflectToAttribute : null;
-				let transformFromAttribute = !isString && !isNumber && !isBoolean && typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
-				reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
-				let setDescriptors = [];
-				for(let classObj of protoTree){
-					let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
-					if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
-				}
-				let eProp = new elementProperty({
-					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
+			let eProp = new elementProperty({
+				propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
+			});
+			config.value = eProp.transformRawValue(config.value);
+			if(config.readOnly) Object.defineProperty(element,name,{
+				enumerable: eProp.enumerable,
+				configurable: eProp.configurable,
+				writable: false,
+				value: eProp.get()
+			});
+			else Object.defineProperty(element,name,eProp);
+			if((reflectToAttribute || reflectFromAttribute) && config.value!==eProp.getValueFromAttribute()){
+				if(reflectToAttribute) eProp.reflectValueToAttribute(config.value);
+				if(reflectFromAttribute) Promise.resolve().then(()=>{
+					if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());
 				});
-				Object.defineProperty(element,name,eProp);
-				if(reflectToAttribute){
-					let newValue = eProp.transformRawValue(config.value);
-					if(newValue!==eProp.getValueFromAttribute()) eProp.reflectValueToAttribute(newValue);
-				}
-				if(reflectFromAttribute && config.value!==eProp.getValueFromAttribute()){
-					Promise.resolve().then(()=>{
-						if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());
-					});
-				}
 			}
+			Object.freeze(config);
 		}
 	}
 	
