@@ -147,7 +147,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				});
 				Object.defineProperty(element,name,eProp);
 				if(reflectToAttribute){
-					let newValue = eProp.transformNewRawValue(config.value);
+					let newValue = eProp.transformRawValue(config.value);
 					if(newValue!==eProp.getValueFromAttribute()) eProp.reflectValueToAttribute(newValue);
 				}
 				if(reflectFromAttribute && config.value!==eProp.getValueFromAttribute()){
@@ -198,12 +198,12 @@ class elementProperty {
 		if(hasAttribute) return element.getAttribute(name);
 	}
 	
-	transformNewRawValue(newValue){
+	transformRawValue(value){
 		let { isBoolean, isNumber, isString } = this.props;
-		if(isBoolean) newValue = !!newValue;
-		else if(isNumber) newValue = newValue===void 0 ? 0 : Number(newValue);
-		else if(isString) newValue = newValue===null || newValue===void 0 ? '' : ''+newValue;
-		return newValue;
+		if(isBoolean) value = !!value;
+		else if(isNumber) value = value===void 0 ? 0 : Number(value);
+		else if(isString) value = value===null || value===void 0 ? '' : ''+value;
+		return value;
 	}
 	
 	reflectValueToAttribute(newValue){
@@ -225,7 +225,7 @@ class elementProperty {
 	
 	set(newValue){
 		let { propertyStore, element, name, reflectToAttribute } = this.props;
-		newValue = this.transformNewRawValue(newValue);
+		newValue = this.transformRawValue(newValue);
 		let inPropStore = propertyStore.hasOwnProperty(name);
 		let oldValue = element[name];
 		if(oldValue===newValue && inPropStore) return;
