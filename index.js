@@ -142,20 +142,14 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 					let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
 					if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 				}
-				if(reflectToAttribute && reflectFromAttribute){
-					if(isBoolean && config.value && !element.hasAttribute(name)) element.setAttribute(name,'');
-					if(isString && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,''+config.value);
-					if(isNumber && config.value!==void 0 && config.value!==null && !element.hasAttribute(name)) element.setAttribute(name,Number(config.value));
-					if(transformToAttribute){
-						let transformedValue = transformToAttribute.apply(element,[config.value]);
-						if(transformedValue===null) element.removeAttribute(name);
-						else element.setAttribute(name,transformedValue);
-					}
-				}
 				let eProp = new elementProperty({
 					propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 				});
 				Object.defineProperty(element,name,eProp);
+				if(reflectToAttribute){
+					let newValue = eProp.transformNewRawValue(config.value);
+					if(newValue!==eProp.getValueFromAttribute()) eProp.reflectValueToAttribute(newValue);
+				}
 				if(reflectFromAttribute && config.value!==eProp.getValueFromAttribute()){
 					Promise.resolve().then(()=>{
 						if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());

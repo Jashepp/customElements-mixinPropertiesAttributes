@@ -265,7 +265,7 @@ If `type` is not specified, `reflectToAttribute` and `reflectFromAttribute` can 
 
 The transform callbacks take one argument (the value), with the `this` keyword as the element.
 
-On `reflectFromAttribute`, if the returned value is undefined, the configured default value will be used.
+On `reflectFromAttribute`, if the returned value is undefined, the configured default value will be used. The argument is null if the attribute doesn't exist.
 
 On `reflectToAttribute`, if the returned value is null, the attribute will be removed.
 
