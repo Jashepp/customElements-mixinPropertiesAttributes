@@ -142,8 +142,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				value: eProp.get()
 			});
 			else Object.defineProperty(element,name,eProp);
+			let reflectToAttributeOnConstruct = 'reflectToAttributeOnConstruct' in config ? !!config.reflectToAttributeOnConstruct : reflectToAttribute;
 			if((reflectToAttribute || reflectFromAttribute) && config.value!==eProp.getValueFromAttribute()){
-				if(reflectToAttribute) eProp.reflectValueToAttribute(config.value);
+				if(reflectToAttribute && reflectToAttributeOnConstruct) eProp.reflectValueToAttribute(config.value);
 				if(reflectFromAttribute) Promise.resolve().then(()=>{
 					if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());
 				});

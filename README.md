@@ -225,6 +225,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `value` | The default value of the property/attribute. | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
 | `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be set or valid). | - |
+| `reflectToAttributeOnConstruct` | `false`: Ignore attribute update on constructor | value of `reflectToAttribute` |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
 | `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be set or valid). | - |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See below for passed paramaters. | - |
@@ -243,6 +244,8 @@ For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflec
 If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, while `type` is not specified, the attribute can be transformed. See [Attribute Transformation](#attribute-transformation).
 
 If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
+
+The `reflectToAttributeOnConstruct` option, when `false`, can be useful to prevent the default value being set as an attribute until it is later changed.
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
