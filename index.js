@@ -103,6 +103,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
 		Object.keys(propsConfig)
+		.sort((a,b)=>{
+			let ac = propsConfig[a], bc = propsConfig[b], ao = 'order' in ac, bo = 'order' in bc;
+			if(ao && bo) return ac.order<bc.order ? -1 : (ac.order>bc.order ? 1 : 0);
+			return ao && !bo ? -1 : (!ao && bo ? 1 : 0);
+		})
 		.forEach((name)=>{
 			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It is a protected property.`);
 			let config = propsConfig[name];

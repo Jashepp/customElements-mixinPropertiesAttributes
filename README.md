@@ -232,6 +232,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `notify` | Emits a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
+| `order` | `number`: The sorting order in which the property gets setup on the class. | - |
 
 For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
 
