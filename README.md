@@ -198,6 +198,7 @@ The second paramater is an optional string which lets you specify the name of th
 ### Property/Attribute Configuration
 
 Property definition example:
+
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
@@ -220,14 +221,14 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 
 | Property | Description (when `true` or specified) | Default Value |
 |-|-|-|
-| `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | - |
-| `value` | The default value of the property/attribute. | - |
+| `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | `undefined` |
+| `value` | The default value of the property/attribute. | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
 | `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be set or valid). | - |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
 | `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be set or valid). | - |
-| `observer` | A class method name (String) or an actual callback (Function) which is fired upon change. See below for passed paramaters. | - |
-| `notify` | Fires a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
+| `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See below for passed paramaters. | - |
+| `notify` | Emits a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
 
@@ -245,7 +246,7 @@ If both the `readOnly` and `reflectToAttribute` options are `true`, the attribut
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
-All events fired when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object).
+All events emitted when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object).
 
 #### Property Change Details Object
 
@@ -268,6 +269,8 @@ The transform callbacks take one argument (the value), with the `this` keyword a
 On `reflectFromAttribute`, if the returned value is undefined, the configured default value will be used. The argument is null if the attribute doesn't exist.
 
 On `reflectToAttribute`, if the returned value is null, the attribute will be removed.
+
+Example:
 
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
@@ -311,6 +314,16 @@ An example use case for `onPropertySet`, where you can do your own logic for you
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
+	static get properties() {
+		return {
+			propName: {
+				type: Boolean,
+				renderOnChange: true // own property to do logic elsewhere
+			},
+			// Additional properties with configs
+		};
+	}
+	// ...
 	constructor() {
 		super({
 			onPropertySet: ({ element,name,config,newValue,oldValue })=>{
@@ -318,6 +331,10 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 				if(config.renderOnChange) element.queueToRender();
 			}
 		});
+	}
+	// ...
+	queueToRender() {
+		// Render code
 	}
 	// ...
 }
@@ -336,6 +353,7 @@ The recommended way to listen for changes to a property is to have a `set` descr
 The alternative is to use the `observer` or `notify` options on the property config (they may be overridden by extended classes), or the `onPropertySet` constructor option on the mixin config.
 
 Setter Example:
+
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
@@ -350,11 +368,11 @@ Changing the property (to a different value) within the `set` descriptor (`sette
 
 This feature only works if there is no `get` descriptor (`getter`) for that same property, unless the `overrideExisting` option is specified, which will remove the `get` descriptor.
 
-There is no error handling or catching for functions/callbacks/events triggered by changes, so if an error occurs, it may effect the mixin's `set` code and further functions/callbacks/events (if multiple specified) will not fire.
+There is no error handling or catching for functions/callbacks/events triggered by changes, so if an error occurs, it may effect the mixin's `set` code and further functions/callbacks/events (if multiple specified) will not emit.
 
 ### Extending Classes
 
-It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign). All classes along the proto tree **must** have the same `static get properties()` method name.
+It is possible to have properties configured on a class (like the above examples), while also having a different class extend it with it's own configured properties. This mixin will search all parent constructors/prototypes for the `static get` properties method and combine all the properties & configurations (using Object.assign). All classes along the proto tree **must** have the same `static get properties()` method name, otherwise it will be ignored.
 
 Properties & configurations on parent classes are overridden by classes which extend them. This means that if the parent class has `observer` or `notify` options set, **they may be overridden**.
 
@@ -395,7 +413,7 @@ All the help is appreciated.
 
 MIT License
 
-Copyright (c) 2019 Jason Sheppard @ https://github.com/Jashepp
+Copyright (c) 2021 Jason Sheppard @ https://github.com/Jashepp
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
