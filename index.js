@@ -102,7 +102,8 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
-		for(let name in propsConfig){
+		Object.keys(propsConfig)
+		.forEach((name)=>{
 			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It is a protected property.`);
 			let config = propsConfig[name];
 			if(config.overrideExisting!==true){
@@ -150,7 +151,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				});
 			}
 			Object.freeze(config);
-		}
+		});
 	}
 	
 };
