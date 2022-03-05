@@ -129,8 +129,10 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
 			let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
 			let reflectFromAttribute = !config.readOnly && ('reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean));
-			let transformToAttribute = !isString && !isNumber && !isBoolean && typeof reflectToAttribute==='function' ? reflectToAttribute : null;
-			let transformFromAttribute = !isString && !isNumber && !isBoolean && typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
+			let transformToAttribute = typeof reflectToAttribute==='function' ? reflectToAttribute : null;
+			let transformFromAttribute = typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
+			if(transformToAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. reflectToAttribute callback does not work with the specified type.`);
+			if(transformFromAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. reflectFromAttribute callback does not work with the specified type.`);
 			reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
 			let setDescriptors = [];
 			for(let classObj of protoTree){

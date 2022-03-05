@@ -224,10 +224,10 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | `undefined` |
 | `value` | The default value of the property/attribute. | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
-| `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be set or valid). | - |
+| `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be valid). | - |
 | `reflectToAttributeOnConstruct` | `false`: Ignore attribute update on constructor | value of `reflectToAttribute` |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
-| `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be set or valid). | - |
+| `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be valid). | - |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See below for passed paramaters. | - |
 | `notify` | Emits a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
@@ -242,7 +242,7 @@ For `Boolean` types, the mixin tries to keep the property as a boolean. All data
 
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
 
-If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, while `type` is not specified, the attribute can be transformed. See [Attribute Transformation](#attribute-transformation).
+If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, the attribute will be transformed. See [Attribute Transformation](#attribute-transformation). If `type` is `String`, `Number` or `Boolean`, an error will be thrown.
 
 If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
