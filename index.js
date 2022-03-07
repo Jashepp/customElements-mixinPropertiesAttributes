@@ -155,6 +155,19 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(reflectToAttribute && reflectToAttributeInConstructor && !attribExists && config.value!==attribValue){
 				eProp.reflectValueToAttribute(config.value);
 			}
+			let delayChangeInConstructor = 'delayChangeInConstructor' in config ? !!config.delayChangeInConstructor : true;
+			if(delayChangeInConstructor){
+				let initValue = config.value;
+				eProp.ignoreEmitChange = true;
+				Promise.resolve().then(()=>{
+					eProp.ignoreEmitChange = false;
+					let nowValue = eProp.get();
+					if(nowValue!==initValue && !eProp.firstChangeEmitted) eProp.emitChange(initValue,nowValue);
+				});
+			}
+			if(reflectFromAttribute && attribExists && config.value!==attribValue){
+				eProp.setValueViaAttribute(attribValue);
+			}
 			Object.freeze(config);
 		});
 	}
@@ -170,6 +183,7 @@ class elementProperty {
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
 		this.firstChangeEmitted = false;
+		this.ignoreEmitChange = false;
 		this.transformingFromAttribute = false;
 	}
 	
@@ -248,6 +262,7 @@ class elementProperty {
 	
 	emitChange(oldValue,newValue){
 		let { element, name, config, onPropertySet, hasObserver, isObserverString, setDescriptors } = this.props;
+		if(this.ignoreEmitChange) return;
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || config.notify){
 			let detailObj = new propertyChangeDetails(element,name,config,newValue,oldValue);

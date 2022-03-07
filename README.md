@@ -226,6 +226,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
 | `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). | - |
 | `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value | `true` if `reflectToAttribute` |
+| `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor | `true` |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
 | `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). | - |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. | - |
@@ -247,6 +248,8 @@ If the `reflectToAttribute` and/or `reflectFromAttribute` options are function c
 If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
 The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
+
+The `delayChangeInConstructor` option, when `false`, prevents [changes](#watching-for-changes) (set, observer, notify) from emitting until after the constructor is finished.
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
