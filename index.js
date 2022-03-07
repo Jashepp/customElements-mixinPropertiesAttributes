@@ -2,7 +2,7 @@
  * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
  * 
  * MIT License
- * Copyright (c) 2018 Jason Sheppard
+ * Copyright (c) 2022 Jason Sheppard
  * 
  * See README.md for more information.
  * NPM: https://npmjs.org/package/ce-mixinprops
