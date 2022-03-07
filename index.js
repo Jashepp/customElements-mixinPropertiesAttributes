@@ -149,12 +149,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				value: eProp.get()
 			});
 			else Object.defineProperty(element,name,eProp);
-			let reflectToAttributeOnConstruct = 'reflectToAttributeOnConstruct' in config ? !!config.reflectToAttributeOnConstruct : reflectToAttribute;
-			if((reflectToAttribute || reflectFromAttribute) && config.value!==eProp.getValueFromAttribute()){
-				if(reflectToAttribute && reflectToAttributeOnConstruct) eProp.reflectValueToAttribute(config.value);
-				if(reflectFromAttribute) Promise.resolve().then(()=>{
-					if(!eProp.firstChangeEmitted) eProp.emitChange(config.value,eProp.get());
-				});
+			let attribExists = this.hasAttribute(name);
+			let attribValue = eProp.getValueFromAttribute();
+			let reflectToAttributeInConstructor = 'reflectToAttributeInConstructor' in config ? !!config.reflectToAttributeInConstructor : true;
+			if(reflectToAttribute && reflectToAttributeInConstructor && !attribExists && config.value!==attribValue){
+				eProp.reflectValueToAttribute(config.value);
 			}
 			Object.freeze(config);
 		});
