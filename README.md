@@ -224,12 +224,12 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | `undefined` |
 | `value` | The default value of the property/attribute. | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
-| `reflectToAttribute` | `function`: Transform value before being set as the attribute (`type` must not be valid). | - |
-| `reflectToAttributeOnConstruct` | `false`: Ignore attribute update on constructor | value of `reflectToAttribute` |
+| `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). | - |
+| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value | `true` if `reflectToAttribute` |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
-| `reflectFromAttribute` | `function`: Transform value after reading from the attribute (`type` must not be valid). | - |
-| `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See below for passed paramaters. | - |
-| `notify` | Emits a *propName*`-changed` event on the class. See below for passed paramaters. | `false` |
+| `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). | - |
+| `observer` | A class method name (String) or an actual callback (Function) which is called upon change. | - |
+| `notify` | Emits a *propName*`-changed` event on the class. | `false` |
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
 | `order` | `number`: The sorting order in which the property gets setup on the class. | - |
@@ -246,11 +246,13 @@ If the `reflectToAttribute` and/or `reflectFromAttribute` options are function c
 
 If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
 
-The `reflectToAttributeOnConstruct` option, when `false`, can be useful to prevent the default value being set as an attribute until it is later changed.
+The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
 All events emitted when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object).
+
+It is recommended to use a `set` descriptor to listen for changes. See '[Watching For Changes](#watching-for-changes)' below.
 
 #### Property Change Details Object
 
@@ -261,8 +263,6 @@ All events emitted when the `notify` option is specified, will have `event.detai
 | `config` | The property/attribute configuration. |
 | `newValue` | The new value. |
 | `oldValue` | The old value. |
-
-It is recommended to use a `set` descriptor to listen for changes. See 'Watching For Changes' below.
 
 #### Attribute Transformation:
 
