@@ -185,11 +185,11 @@ class elementProperty {
 	}
 	
 	getValueFromAttribute(){
-		let { element, name, isBoolean, isNumber, transformFromAttribute } = this.props;
+		let { element, name, isBoolean, isNumber, isString, transformFromAttribute, config } = this.props;
 		let hasAttribute = element.hasAttribute(name);
 		if(isBoolean) return hasAttribute;
-		if(hasAttribute && isNumber) return Number(element.getAttribute(name));
-		if(transformFromAttribute){
+		if(hasAttribute && (isNumber || isString)) return this.transformRawValue(element.getAttribute(name));
+		if(!config.readOnly && transformFromAttribute){
 			if(this.transformingFromAttribute) return;
 			this.transformingFromAttribute = true;
 			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(name) : null]);
