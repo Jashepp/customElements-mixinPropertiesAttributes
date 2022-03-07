@@ -46,6 +46,7 @@ const buildConstructorPropsConfig = (propertiesName,protoTree)=>{
 };
 
 const propsConfigSymbol = Symbol('mixinProps-propsConfig');
+const elementPropertySymbol = Symbol('mixinProps-elementProperty');
 
 /**
  * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
@@ -83,12 +84,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			}
 		}
 		if(name in propsConfig){
-			let config = propsConfig[name], type = config.type;
-			if(type===Boolean) newValue = newValue!==null;
-			else if(type===Number) newValue = Number(newValue);
-			else if(type===String) newValue = newValue===null ? '' : ''+newValue;
-			else if(!config.readOnly && 'reflectFromAttribute' in config && typeof config.reflectFromAttribute==='function') newValue = config.reflectFromAttribute.apply(this,[newValue]);
-			this[name] = newValue;
+			let config = propsConfig[name];
+			let eProp = config[elementPropertySymbol];
+			eProp.setValueViaAttribute(newValue);
 		}
 	}
 	
@@ -143,6 +141,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
 			config.value = eProp.transformRawValue(config.value);
+			config[elementPropertySymbol] = eProp;
 			if(config.readOnly) Object.defineProperty(element,name,{
 				enumerable: eProp.enumerable,
 				configurable: eProp.configurable,
@@ -198,6 +197,18 @@ class elementProperty {
 			return transformedValue;
 		}
 		if(hasAttribute) return element.getAttribute(name);
+	}
+	
+	setValueViaAttribute(newValue){
+		let { element, isBoolean, transformFromAttribute, config } = this.props;
+		if(isBoolean) newValue = newValue!==null;
+		newValue = this.transformRawValue(newValue);
+		if(!config.readOnly && transformFromAttribute){
+			this.transformingFromAttribute = true;
+			newValue = transformFromAttribute.apply(element,[newValue]);
+			this.transformingFromAttribute = false;
+		}
+		this.set(newValue);
 	}
 	
 	transformRawValue(value){
