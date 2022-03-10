@@ -11,7 +11,7 @@ This class mixin adds functionality to your web component (custom element) to he
 
 This is written with vanilla JavaScript. No external dependencies required.
 
-No hidden or internal properties/methods are added to your class(es). The only property/method that is not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
+No conflicting properties/methods are added to your class(es). The only properties/methods that are not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties, and an internal property with a `Symbol` key. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
 
 This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
 
@@ -225,8 +225,8 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `value` | The default value of the property/attribute. | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
 | `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). | - |
-| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value | `true` if `reflectToAttribute` |
-| `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor | `true` |
+| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value. | `true` if `reflectToAttribute` |
+| `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor. | `true` |
 | `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
 | `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). | - |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. | - |
@@ -241,15 +241,17 @@ For `Number` types, the mixin tries to keep the property as a number. `Null` and
 
 For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
+If a `Boolean` default value is `true`, yet it doesn't exist as an attribute upon construction, it will **not** [cause a change](#watching-for-changes) to `false`. However `String` and `Number` attributes **will** [cause a change](#watching-for-changes) if they differ from the default value upon construction. So will other types if `reflectFromAttribute` is set.
+
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
 
-If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, the attribute will be transformed. See [Attribute Transformation](#attribute-transformation). If `type` is `String`, `Number` or `Boolean`, an error will be thrown.
+If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, the [attribute will be transformed](#attribute-transformation). If `type` is also `String`, `Number` or `Boolean`, an error will be thrown.
 
-If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction via `''+value`. The attribute may be changed, but the property will remain unchanged.
+If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction. The attribute may be changed, but the property will remain unchanged.
 
 The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
 
-The `delayChangeInConstructor` option, when `false`, prevents [changes](#watching-for-changes) (set, observer, notify) from emitting until after the constructor is finished.
+The `delayChangeInConstructor` option, when `false`, prevents [changes](#watching-for-changes) (set, observer, notify) from emitting until after the constructor is finished. via Promise.resolve().then();
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
@@ -273,11 +275,11 @@ If `type` is not specified, `reflectToAttribute` and `reflectFromAttribute` can 
 
 The transform callbacks take one argument (the value), with the `this` keyword as the element.
 
-On `reflectFromAttribute`, if the returned value is undefined, the configured default value will be used. The argument is null if the attribute doesn't exist.
+On `reflectFromAttribute`, if the returned value is `undefined`, the configured default value will be used. The argument is `null` if the attribute doesn't exist.
 
-On `reflectToAttribute`, if the returned value is null, the attribute will be removed.
+On `reflectToAttribute`, if the returned value is `null`, the attribute will be removed.
 
-Example:
+Transform Example:
 
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
@@ -329,6 +331,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 			propName: {
 				type: Boolean,
 				renderOnChange: true // own property to do logic elsewhere
+				// observer: 'queueToRender' is also possible
 			},
 			// Additional properties with configs
 		};
@@ -369,6 +372,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 	set myPropertyName(newValue){
 		console.log('myPropertyName has changed:',newValue);
+		// your logic
 	}
 	// ...
 }
@@ -450,7 +454,7 @@ Github Repository: [https://github.com/Jashepp/customElements-mixinPropertiesAtt
 NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 
 [github-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
-[github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tree/master
+[github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
 [github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
 [github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
 [npm-image]: https://img.shields.io/npm/v/ce-mixinprops.svg?style=flat-square
