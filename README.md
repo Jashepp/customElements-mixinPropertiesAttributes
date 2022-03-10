@@ -314,6 +314,7 @@ Upon construction, an optional options object can be passed to `super()` to conf
 | `protectedProperties` | An array of properties/attributes that are 'protected', meaning there can not be properties/attributes specified as such. |
 | `propertyStore` | An object which stores the values for the properties/attributes. |
 | `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the [Property Change Details Object](#property-change-details-object). |
+| `propertyDefaults` | An object of defaults for all properties/attributes (excluding `overrideExisting` option). |
 | `superArguments` | An array of arguments/paramaters passed to the `base` class constructor. |
 
 In addition to `superArguments`, the other arguments on `super()`, such as `super(null,'one','two')` (excluding first argument) will also passthrough to the extending class.

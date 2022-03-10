@@ -91,7 +91,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 	}
 	
 	constructor(argOptions={},...argRest) {
-		let { protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] } = Object(argOptions);
+		let { protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[], propertyDefaults={} } = Object(argOptions);
 		super(...([].concat(superArguments,argRest)));
 		let element = this;
 		let protoTree = getConstructorTree(Object.getPrototypeOf(this));
@@ -101,6 +101,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
+		let hasDefaults = Object.keys(propertyDefaults).length>0;
 		Object.keys(propsConfig)
 		.sort((a,b)=>{
 			let ac = propsConfig[a], bc = propsConfig[b], ao = 'order' in ac, bo = 'order' in bc;
@@ -124,6 +125,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				}
 				if(propExists) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It already exists on ${protoPath.join('=>')}.`);
 			}
+			if(hasDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
 			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
 			let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
 			let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
