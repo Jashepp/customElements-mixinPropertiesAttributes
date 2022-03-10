@@ -316,6 +316,8 @@ Upon construction, an optional options object can be passed to `super()` to conf
 | `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the [Property Change Details Object](#property-change-details-object). |
 | `superArguments` | An array of arguments/paramaters passed to the `base` class constructor. |
 
+In addition to `superArguments`, the other arguments on `super()`, such as `super(null,'one','two')` (excluding first argument) will also passthrough to the extending class.
+
 An example use case for `onPropertySet`, where you can do your own logic for your own property configure options:
 
 ```js

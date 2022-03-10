@@ -90,8 +90,9 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		}
 	}
 	
-	constructor({ protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] }={}) {
-		super(...superArguments);
+	constructor(argOptions={},...argRest) {
+		let { protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[] } = Object(argOptions);
+		super(...([].concat(superArguments,argRest)));
 		let element = this;
 		let protoTree = getConstructorTree(Object.getPrototypeOf(this));
 		let propsConfig = buildConstructorPropsConfig(propertiesName,protoTree);
