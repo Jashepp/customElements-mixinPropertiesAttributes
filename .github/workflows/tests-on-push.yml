@@ -1,0 +1,91 @@
+name: Tests
+
+on: [push]
+
+# https://docs.cypress.io/guides/continuous-integration/github-actions#Worker-
+# https://github.com/cypress-io/github-action
+jobs:
+  
+  tests-electron:
+    runs-on: ubuntu-latest
+    name: Tests on Electron
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: electron
+          install: true
+          runTests: true
+          start: npm run server
+          wait-on: 'http://localhost:8181'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  tests-chrome:
+    runs-on: ubuntu-latest
+    name: Tests on Chrome
+    container:
+      # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers
+      image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+      options: --user 1001
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          install: true
+          runTests: true
+          start: npm run server
+          wait-on: 'http://localhost:8181'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  tests-firefox:
+    runs-on: ubuntu-latest
+    name: Tests on Firefox
+    container:
+      image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+      options: --user 1001
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: firefox
+          install: true
+          runTests: true
+          start: npm run server
+          wait-on: 'http://localhost:8181'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  tests-edge:
+    runs-on: ubuntu-latest
+    name: Tests on Edge
+    container:
+      image: cypress/browsers:node14.10.1-edge88
+      #options: --user 1001
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Delete old package-lock
+        run: rm ./package-lock.json
+      - name: Upgrade NPM
+        run: npm install -g npm@8.5
+      - name: Build new package-lock
+        run: npm i --package-lock-only
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: edge
+          install: true
+          runTests: true
+          start: npm run server
+          wait-on: 'http://localhost:8181'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
