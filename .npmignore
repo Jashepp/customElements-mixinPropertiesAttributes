@@ -1,3 +1,6 @@
 node_modules
 /.vscode/
+/.github/
 /cypress/
+cypress.json
+/tests/

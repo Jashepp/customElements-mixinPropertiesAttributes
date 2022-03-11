@@ -1,0 +1,7 @@
+{
+    "baseUrl": "http://localhost:8181/tests/",
+    "includeShadowDom": true,
+    "integrationFolder": "tests/",
+    "testFiles": "**/*.test.js",
+    "video": false
+}

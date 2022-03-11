@@ -2,6 +2,7 @@
 
 [![NPM Version][npm-image]][npm-url]
 [![Downloads Stats][npm-downloads]][npm-url]
+[![Tests][github-tests-badge]][github-tests-url]
 
 Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
 
@@ -415,13 +416,37 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 ## Tests
 
-Coming Soon
+Tests are located within `./tests/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include tests.
+
+To get started with tests, enter local directory of this repository and run:
+```
+npm install --only=dev
+```
+
+This should install `cypress` and other dev dependancies needed to run the tests.
+
+To run a UI interactive version of the tests using cypress, run:
+```
+npm run cypress+server
+```
+
+To run a CLI-only version of the tests, run:
+```
+npm run test
+```
+
+To continuously run tests while editing, run:
+```
+npm run watch:test
+```
 
 ## Contributors
 
-Create issues or pull requests on the GitHub project.
+To submit a contribution, create issues or pull requests on the GitHub project.
 
-All the help is appreciated.
+Please be sure to run tests after any changes.
+
+All help is appreciated. Even if it's just improvements to this readme or the tests.
 
 ## License
 
@@ -457,6 +482,8 @@ NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 [github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
 [github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
 [github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
+[github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml/badge.svg?event=release
+[github-tests-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml
 [npm-image]: https://img.shields.io/npm/v/ce-mixinprops.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/ce-mixinprops
 [npm-downloads]: https://img.shields.io/npm/dm/ce-mixinprops.svg?style=flat-square
