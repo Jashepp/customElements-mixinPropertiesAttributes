@@ -30,7 +30,13 @@ jobs:
         with:
           node-version: 16
           registry-url: https://npm.pkg.github.com/
+          scope: '@Jashepp'
       - run: npm ci
-      - run: npm publish
+      - name: Publish to GitHub Package Registry
+        run: |
+          npm config set scope "@Jashepp"
+          npm config set @Jashepp:registry https://npm.pkg.github.com/
+          npm pkg set name=@Jashepp/ce-mixinprops
+          npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
