@@ -482,7 +482,7 @@ NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 [github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
 [github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
 [github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
-[github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml/badge.svg?event=release
+[github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml/badge.svg
 [github-tests-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml
 [npm-image]: https://img.shields.io/npm/v/ce-mixinprops.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/ce-mixinprops
