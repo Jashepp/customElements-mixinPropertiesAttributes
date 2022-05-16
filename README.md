@@ -252,7 +252,7 @@ If both the `readOnly` and `reflectToAttribute` options are `true`, the attribut
 
 The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
 
-The `delayChangeInConstructor` option, when `false`, prevents [changes](#watching-for-changes) (set, observer, notify) from emitting until after the constructor is finished. via Promise.resolve().then();
+The `delayChangeInConstructor` option, when `true`, delays all [changes](#watching-for-changes) (set, observer, notify) during the constructor (and current call stack), with an [event loop microtask](https://youtu.be/cCOL7MC4Pl0), via `Promise.resolve().then()`. When `false`, the changes emit during the constructor as the change is made.
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
