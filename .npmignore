@@ -4,3 +4,4 @@ node_modules
 /cypress/
 cypress.json
 /tests/
+/package-lock.json

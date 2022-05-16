@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Build package-lock
+        run: npm i --package-lock-only
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
@@ -33,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Build package-lock
+        run: npm i --package-lock-only
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
@@ -53,6 +57,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Build package-lock
+        run: npm i --package-lock-only
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
@@ -73,11 +79,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Delete old package-lock
-        run: rm ./package-lock.json
+      #- name: Delete old package-lock
+      #  run: rm ./package-lock.json
       - name: Upgrade NPM
         run: npm install -g npm@8.5
-      - name: Build new package-lock
+      - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
         uses: cypress-io/github-action@v2
