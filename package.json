@@ -10,9 +10,9 @@
     "url": "https://github.com/Jashepp/customElements-mixinPropertiesAttributes"
   },
   "devDependencies": {
-    "cypress": "^9.5.1",
-    "http-server": "^14.1.0",
-    "nodemon": "^2.0.15",
+    "cypress": "^10.2.0",
+    "http-server": "^14.1.1",
+    "nodemon": "^2.0.18",
     "start-server-and-test": "^1.14.0"
   },
   "scripts": {

@@ -2,7 +2,7 @@ name: Tests
 
 on: [push]
 
-# https://docs.cypress.io/guides/continuous-integration/github-actions#Worker-
+# https://docs.cypress.io/guides/continuous-integration/github-actions
 # https://github.com/cypress-io/github-action
 jobs:
   
@@ -11,11 +11,11 @@ jobs:
     name: Tests on Electron
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4.1.0
         with:
           browser: electron
           install: true
@@ -30,15 +30,15 @@ jobs:
     name: Tests on Chrome
     container:
       # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers
-      image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4.1.0
         with:
           browser: chrome
           install: true
@@ -52,15 +52,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Tests on Firefox
     container:
-      image: cypress/browsers:node16.14.0-slim-chrome99-ff97
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.0.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4.1.0
         with:
           browser: firefox
           install: true
@@ -74,19 +74,15 @@ jobs:
     runs-on: ubuntu-latest
     name: Tests on Edge
     container:
-      image: cypress/browsers:node14.10.1-edge88
-      #options: --user 1001
+      image: cypress/browsers:node16.14.2-slim-chrome100-ff99-edge
+      options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      #- name: Delete old package-lock
-      #  run: rm ./package-lock.json
-      - name: Upgrade NPM
-        run: npm install -g npm@8.5
+        uses: actions/checkout@v3.0.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v4.1.0
         with:
           browser: edge
           install: true

@@ -2,6 +2,6 @@ node_modules
 /.vscode/
 /.github/
 /cypress/
-cypress.json
+cypress.config.js
 /tests/
 /package-lock.json
