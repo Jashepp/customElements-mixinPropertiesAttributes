@@ -3,6 +3,11 @@
   "version": "1.7.0",
   "description": "Mixin for Custom Elements (Web Components) to handle/sync properties and attributes",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./cypress.config.js": "./cypress.config.js"
+  },
   "author": "unchosen.aus@gmail.com",
   "license": "MIT",
   "repository": {
