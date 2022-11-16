@@ -9,4 +9,5 @@ module.exports = defineConfig({
     },
     "includeShadowDom": true,
     "video": false,
+    "screenshotOnRunFailure": false,
 });
