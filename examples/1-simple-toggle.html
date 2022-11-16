@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="module">
+		// Before running this example, install and specify the correct import paths
+		import { mixinPropertiesAttributes } from '../index.js'; // or https://unpkg.com/ce-mixinprops
+
+		// Define a class with the mixin on HTMLElement (or a class that extends it)
+		export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
+			
+			// Define the behaviour/options of properties
+			static get properties() {
+				return {
+					show: {
+						type: Boolean,
+						value: true
+					},
+					hide: {
+						type: Boolean,
+						value: false
+					}
+				};
+			}
+			
+			// Toggle .style.display between none and previous value
+			set show(show) {
+				if(show) this.style.display = this._previousDisplay;
+				else {
+					this._previousDisplay = this.style.display || '';
+					if(this._previousDisplay==='none') this._previousDisplay = '';
+					this.style.display = 'none';
+				}
+				this.hide = !show;
+			}
+			
+			set hide(hide) {
+				this.show = !hide;
+			}
+			
+			constructor() {
+				super();
+				this._previousDisplay = this.style.display || '';
+			}
+			
+		}
+
+		// Define a custom element name with the above class
+		customElements.define('example-toggle',exampleToggle);
+	</script>
+</head>
+<body>
+	<p>Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change.
+	<br />Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.</p>
+	<div onclick="document.querySelector('#exampleToggle').show = !document.querySelector('#exampleToggle').show">
+		Hello, <example-toggle id="exampleToggle">Beautiful</example-toggle> World!
+	</div>
+</body>
+</html>

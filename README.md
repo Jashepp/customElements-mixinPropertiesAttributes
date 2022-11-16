@@ -34,7 +34,7 @@ import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops'; // 
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
 
-## Example 1
+## Examples
 
 Javascript Module:
 
@@ -42,7 +42,7 @@ Simple display toggle.
 
 ```js
 // Before running this example, install and specify the correct import paths
-import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
+import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
 
 // Define a class with the mixin on HTMLElement (or a class that extends it)
 export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
@@ -62,7 +62,7 @@ export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 	}
 	
 	// Toggle .style.display between none and previous value
-	set show(show){
+	set show(show) {
 		if(show) this.style.display = this._previousDisplay;
 		else {
 			this._previousDisplay = this.style.display || '';
@@ -72,7 +72,7 @@ export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 		this.hide = !show;
 	}
 	
-	set hide(hide){
+	set hide(hide) {
 		this.show = !hide;
 	}
 	
@@ -101,82 +101,20 @@ Hello, Beautiful World!
 
 Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change. Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.
 
-## Example 2
-
-Javascript Module:
-
-Using [lit-html](https://github.com/PolymerLabs/lit-html) as the renderer.
-
-```js
-// Before running this example, install and specify the correct import paths
-import { html, render as litRender } from 'lit-html/lit-html.js';
-import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js';
-
-// Define a class with the mixin on HTMLElement (or a class that extends it)
-export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
-	
-	// Element name (used with customElements.define below)
-	static get is() { return 'example-hello'; }
-	
-	// Define the behaviour/options of properties
-	static get properties() {
-		return {
-			name: {
-				type: String,
-				value: 'World'
-			}
-		};
-	}
-	
-	// On-change listener for 'name' property
-	set name(v){
-		// Render element content
-		this.renderNow();
-	}
-	
-	constructor() {
-		super();
-		// Use ShadowDOM (comment this to disable)
-		this.attachShadow({ mode:'open' });
-	}
-	
-	// Define element content via lit-html
-	render() {
-		return html`
-			<style type="text/css">:host { display: block; }</style>
-			<span>Hello, ${this.name}!</span>
-		`;
-	}
-	
-	// Render element to ShadowDOM or DOM
-	renderNow(){
-		litRender(this.render(), this.shadowRoot||this);
-	}
-	
-	// Render upon DOM attachment
-	connectedCallback() {
-		this.renderNow();
-	}
-	
-}
-
-// Define a custom element name with the above class
-customElements.define(exampleHello.is,exampleHello);
-```
-
-HTML:
+Or with the following code, just click within the div to toggle the `show` property/attribute:
 
 ```html
-<example-hello name="Developer"></example-hello>
+<div onclick="document.querySelector('#exampleToggle').show = !document.querySelector('#exampleToggle').show">
+	Hello, <example-toggle id="exampleToggle">Beautiful</example-toggle> World!
+</div>
 ```
 
-Rendered Result:
+### More Examples
 
-```
-Hello, Developer!
-```
+More examples are located within `./examples/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include the examples directory.
 
-Freely change the `name` attribute in your browser developer tools and watch the property and rendered result change. Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.
+- [Example 1 - Simple Toggle](./examples/1-simple-toggle.html)
+- [Example 2 - Using lit-html as the renderer](./examples/2-lit-html.html)
 
 ## How To Use / API
 

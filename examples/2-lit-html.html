@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="module">
+		// Before running this example, install and specify the correct import paths
+		import { html, render as litRender } from 'https://unpkg.com/lit-html';
+		import { mixinPropertiesAttributes } from '../index.js'; // or https://unpkg.com/ce-mixinprops
+
+		// Define a class with the mixin on HTMLElement (or a class that extends it)
+		export class exampleHello extends mixinPropertiesAttributes(HTMLElement) {
+			
+			// Element name (used with customElements.define below)
+			static get is() { return 'example-hello'; }
+			
+			// Define the behaviour/options of properties
+			static get properties() {
+				return {
+					name: {
+						type: String,
+						value: 'World'
+					}
+				};
+			}
+			
+			// On-change listener for 'name' property
+			set name(v) {
+				if(v=='') this.name = 'Nothing';
+				// Render element content
+				this.queueRender();
+			}
+			
+			constructor() {
+				super();
+				this.renderQueued = false;
+				// Use ShadowDOM (comment this to disable)
+				this.attachShadow({ mode:'open' });
+			}
+			
+			// Define element content via lit-html
+			render() {
+				return html`
+					<style type="text/css">:host { display: block; }</style>
+					<span>Hello, ${this.name}!</span>
+				`;
+			}
+			
+			queueRender(){
+				if(this.renderQueued) return;
+				this.renderQueued = requestAnimationFrame(()=>{
+					litRender(this.render(), this.shadowRoot||this);
+					this.renderQueued = null;
+				});
+			}
+
+			// Render upon DOM attachment
+			connectedCallback() {
+				this.queueRender();
+			}
+			
+		}
+
+		// Define a custom element name with the above class
+		customElements.define(exampleHello.is,exampleHello);
+	</script>
+	<style type="text/css">
+		*:not(:defined) { color: #999999; }
+	</style>
+</head>
+<body>
+	<p>Freely change the `name` attribute in your browser developer tools and watch the property and rendered result change.
+	<br />Also change the `name` property on the element object itself via your developer tools console and watch the attribute and rendered result change.</p>
+	<example-hello name="Developer">Loading...</example-hello>
+</body>
+</html>
