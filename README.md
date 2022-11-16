@@ -189,7 +189,7 @@ If `attribute` is different than the property name, the property-attribute bindi
 
 #### Default Value
 
-Upon construction (initialisation of the element), if an attribute **exists** on the element, and it **differs** from the default value, it will [cause a change](#watching-for-changes). **Except** when `reflectFromAttribute` is `false` (or fn results with `null`). If the attribute does **not exist** on the element, yet there is a default value, the attribute will be added to the element. **Except** for `Boolean` when `false`, when `reflectFromAttribute` is `false` (or fn results with `null`), or when `reflectToAttributeInConstructor` is `false`.
+Upon construction (initialisation of the element), if an attribute **exists** on the element, and it **differs** from the default value, it will [cause a change](#watching-for-changes). **Except** when `reflectToAttribute` is `false` (or fn results with `null`). If the attribute does **not exist** on the element, yet there is a default value, the attribute will be added to the element. **Except** for `Boolean` when `false`, when `reflectToAttribute` is `false` (or fn results with `null`), or when `reflectToAttributeInConstructor` is `false`.
 
 #### Attribute Reflection
 
