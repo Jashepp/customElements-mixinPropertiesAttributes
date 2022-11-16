@@ -220,37 +220,52 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 Properties **are** case sensitive, and attributes are **not** case sensitive (due to how attributes work). There cannot be duplicate properties with different cases. All options are optional. 
 
-| Property | Description (when `true` or specified) | Default Value |
+| Property Config Option | Description (when `true` or specified) | Default Value |
 |-|-|-|
-| `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. | `undefined` |
-| `value` | The default value of the property/attribute. | `undefined` |
-| `reflectToAttribute` | `true`: Sync changes on the property to the attribute. | Automatic |
-| `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). | - |
-| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value. | `true` if `reflectToAttribute` |
-| `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor. | `true` |
-| `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. | Automatic |
-| `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). | - |
-| `observer` | A class method name (String) or an actual callback (Function) which is called upon change. | - |
-| `notify` | Emits a *propName*`-changed` event on the class. | `false` |
-| `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. | `false` |
+| `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. See [Property Types](#property-types). | `undefined` |
+| `attribute` | Overwrite attribute name to differ from property name. See [Alternate Attribute Name](#alternate-attribute-name) | Property Name |
+| `value` | The default value of the property/attribute.  See [Default Value](#default-value). | `undefined` |
+| `reflectToAttribute` | `true`: Sync changes on the property to the attribute. See [Attribute Reflection](#attribute-reflection). | Automatic |
+| `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). See [Attribute Reflection](#attribute-reflection). | - |
+| `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. See [Attribute Reflection](#attribute-reflection). | Automatic |
+| `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). See [Attribute Reflection](#attribute-reflection). | - |
+| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value. See [Attribute Reflection](#attribute-reflection). | `true` if `reflectToAttribute` |
+| `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. See [Attribute Reflection](#attribute-reflection). | `false` |
+| `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor. See [Configuring Value Changes](#configuring-value-changes). | `true` |
+| `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See [Configuring Value Changes](#configuring-value-changes). | - |
+| `notify` | Emits a *propName*`-changed` event on the class. See [Configuring Value Changes](#configuring-value-changes). | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
 | `order` | `number`: The sorting order in which the property gets setup on the class. | - |
+
+#### Property Types
 
 For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
 
 For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`. Failed conversions may result with `NaN`.
 
-For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is true when the attribute exists, and false when the attribute does not exist (assuming the attribute is being reflected to/from the property).
+For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is `true` when the attribute exists, and `false` when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
-If a `Boolean` default value is `true`, yet it doesn't exist as an attribute upon construction, it will **not** [cause a change](#watching-for-changes) to `false`. However `String` and `Number` attributes **will** [cause a change](#watching-for-changes) if they differ from the default value upon construction. So will other types if `reflectFromAttribute` is set.
+#### Alternate Attribute Name
+
+If `attribute` is different than the property name, the property-attribute binding will use this value for the attribute name on the element. If the attribute already exists as a different property name (**or** attribute name if specified), an error will be thrown. It can be the name of an existing property if the property has an alternate attribute name.
+
+#### Default Value
+
+Upon construction (initialisation of the element), if an attribute **exists** on the element, and it **differs** from the default value, it will [cause a change](#watching-for-changes). **Except** when `reflectFromAttribute` is `false` (or fn results with `null`). If the attribute does **not exist** on the element, yet there is a default value, the attribute will be added to the element. **Except** for `Boolean` when `false`, when `reflectFromAttribute` is `false` (or fn results with `null`), or when `reflectToAttributeInConstructor` is `false`.
+
+#### Attribute Reflection
 
 For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
 
 If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, the [attribute will be transformed](#attribute-transformation). If `type` is also `String`, `Number` or `Boolean`, an error will be thrown.
 
-If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction. The attribute may be changed, but the property will remain unchanged.
-
 The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
+
+If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction.
+
+If `readOnly` is `true`, and the attribute's value is changed, the property will remain unchanged, so no [changes](#watching-for-changes) will be emitted.
+
+#### Configuring Value Changes
 
 The `delayChangeInConstructor` option, when `true`, delays all [changes](#watching-for-changes) (set, observer, notify) during the constructor (and current call stack), with an [event loop microtask](https://youtu.be/cCOL7MC4Pl0), via `Promise.resolve().then()`. When `false`, the changes emit during the constructor as the change is made.
 
@@ -314,7 +329,8 @@ Upon construction, an optional options object can be passed to `super()` to conf
 
 | Property | Description (when specified) |
 |-|-|
-| `protectedProperties` | An array of properties/attributes that are 'protected', meaning there can not be properties/attributes specified as such. |
+| `protectedProperties` | An array of properties that are 'protected', meaning there can not be properties specified as such. |
+| `protectedAttributes` | An array of attributes that are 'protected', meaning there can not be attributes specified as such. |
 | `propertyStore` | An object which stores the values for the properties/attributes. |
 | `onPropertySet` | A callback which is called on any property/attribute change. The first paramater is the [Property Change Details Object](#property-change-details-object). |
 | `propertyDefaults` | An object of defaults for all properties/attributes (excluding `overrideExisting` option). |

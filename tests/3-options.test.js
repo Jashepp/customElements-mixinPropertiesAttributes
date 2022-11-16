@@ -13,6 +13,78 @@ describe("Property Options",()=>{
 		lastUncaughtError = null;
 	});
 
+	it("attribute: different than property name",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('have.attr','attrDiffAttribute','foo')
+			.should('not.have.attr','attrDiffProp','')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp','foo');
+				expect(e).to.not.have.property('attrDiffAttribute');
+				e.attrDiffProp = 'bar';
+			})
+			.should('have.attr','attrDiffAttribute','bar')
+			.should('not.have.attr','attrDiffProp','')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp','bar');
+				expect(e).to.not.have.property('attrDiffAttribute');
+				e.setAttribute('attrDiffAttribute','foobar');
+			})
+			.should('have.attr','attrDiffAttribute','foobar')
+			.should('not.have.attr','attrDiffProp','')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp','foobar');
+				expect(e).to.not.have.property('attrDiffAttribute');
+				e.attrDiffAttribute = 'not-change';
+				e.setAttribute('attrDiffProp','not-change');
+			})
+			.should('have.attr','attrDiffAttribute','foobar')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp','foobar');
+			});
+	});
+
+	it("attribute: name swapped with different property/attribute",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('have.attr','attrDiffProp2','foo3')
+			.should('have.attr','attrDiffProp3','foo2')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp2','foo2');
+				expect(e).to.have.property('attrDiffProp3','foo3');
+				e.attrDiffProp2 = 'bar2';
+				e.attrDiffProp3 = 'bar3';
+			})
+			.should('have.attr','attrDiffProp2','bar3')
+			.should('have.attr','attrDiffProp3','bar2')
+			.then(([e])=>{
+				expect(e).to.have.property('attrDiffProp2','bar2');
+				expect(e).to.have.property('attrDiffProp3','bar3');
+			});
+	});
+
+	it("attribute: existing attrib name - catch error",()=>{
+		ignoreUncaughtErrors = true;
+		cy.visit('/options-basic/3-attribute-conflictAttribName.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'attrDiffProp/attrdiffattribute' on testElementOptions. It already exists as a different property/attribute 'attrDiffPropConflict/attrdiffattribute'.`);
+				expect(e).to.not.have.property('attrDiffPropConflict');
+			})
+			.should('not.have.attr','attrDiffPropConflict','');
+	});
+
+	it("attribute: existing attrib name (using prop name) - catch error",()=>{
+		ignoreUncaughtErrors = true;
+		cy.visit('/options-basic/3-attribute-existingPropName.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'attrDiffPropConflict/attrdiffprop' on testElementOptions. It already exists as a different property/attribute 'attrDiffProp'.`);
+				expect(e).to.not.have.property('attrDiffPropConflict');
+			})
+			.should('not.have.attr','attrDiffPropConflict','');
+	});
+
 	it("reflectFromAttribute: false - no type",()=>{
 		cy.visit('/options-basic/index.html');
 		cy.get('#testElement')
@@ -655,7 +727,19 @@ describe("Constructor Options",()=>{
 		cy.visit('/options-constructor/4-protected2.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'prop2' on testElementConstructor. It is a protected property.`);
+				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'prop2' on testElementConstructor. 'prop2' is a protected property.`);
+				expect(e.underTest,'Check underTest').to.eq('valueFromMain3');
+			})
+			.should('not.have.attr','prop1','')
+			.should('not.have.attr','prop2','');
+	});
+
+	it("protectedAttributes - in-use attribute - catch error",()=>{
+		ignoreUncaughtErrors = true;
+		cy.visit('/options-constructor/4-protected3.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'prop2' on testElementConstructor. 'prop2' is a protected attribute.`);
 				expect(e.underTest,'Check underTest').to.eq('valueFromMain3');
 			})
 			.should('not.have.attr','prop1','')

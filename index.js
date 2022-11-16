@@ -45,7 +45,7 @@ const buildConstructorPropsConfig = (propertiesName,protoTree)=>{
 	return propsConfig;
 };
 
-const propsConfigSymbol = Symbol('mixinProps-propsConfig');
+const propsConfigByAttributeSymbol = Symbol('mixinProps-propsConfigByAttribute');
 const elementPropertySymbol = Symbol('mixinProps-elementProperty');
 
 /**
@@ -56,51 +56,42 @@ const elementPropertySymbol = Symbol('mixinProps-elementProperty');
 export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
 	
 	static get observedAttributes() {
-		let propsLower = [], propsConfig = buildProtoPropsConfig(propertiesName,getProtoTree(this));
-		return Object.keys(propsConfig).filter(prop=>{
-			if(propsConfig[prop].readOnly) return false;
-			let type = propsConfig[prop].type;
-			let safeAttributeType = type===String || type===Number || type===Boolean;
-			let observe = 'reflectFromAttribute' in propsConfig[prop] ? !!propsConfig[prop].reflectFromAttribute : safeAttributeType;
-			if(observe){
-				let propLower = prop.toLowerCase();
-				if(propLower!==prop) propsLower.push(propLower);
-			}
+		let attributeArr = [], propsConfig = buildProtoPropsConfig(propertiesName,getProtoTree(this));
+		return Object.keys(propsConfig).filter(name=>{
+			let config = propsConfig[name];
+			if(config.readOnly) return false;
+			let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+			let safeAttributeType = config.type===String || config.type===Number || config.type===Boolean;
+			let observe = 'reflectFromAttribute' in config ? !!config.reflectFromAttribute : safeAttributeType;
+			if(observe) attributeArr.push(attribute);
 			return observe;
-		}).concat(propsLower,super.observedAttributes || []);
+		}).concat(attributeArr,super.observedAttributes || []);
 	}
 	
-	attributeChangedCallback(name,oldValue,newValue){
-		if(super.attributeChangedCallback) super.attributeChangedCallback(name,oldValue,newValue);
+	attributeChangedCallback(attribute,oldValue,newValue){
+		if(super.attributeChangedCallback) super.attributeChangedCallback(attribute,oldValue,newValue);
 		if(oldValue===newValue) return;
-		let propsConfig = this[propsConfigSymbol];
-		if(!(name in propsConfig)){
-			let props = Object.keys(propsConfig);
-			for(let i=0,l=props.length; i<l; i++){
-				if(props[i].toLowerCase()===name){
-					name = props[i];
-					break;
-				}
-			}
-		}
-		if(name in propsConfig){
-			let config = propsConfig[name];
+		let propsConfigByAttribute = this[propsConfigByAttributeSymbol];
+		attribute = attribute.toLowerCase();
+		if(attribute in propsConfigByAttribute){
+			let config = propsConfigByAttribute[attribute];
 			let eProp = config[elementPropertySymbol];
 			eProp.setValueViaAttribute(newValue);
 		}
 	}
 	
 	constructor(argOptions={},...argRest) {
-		let { protectedProperties=[], propertyStore={}, onPropertySet, superArguments=[], propertyDefaults={} } = Object(argOptions);
+		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, superArguments=[], propertyDefaults={} } = Object(argOptions);
 		super(...([].concat(superArguments,argRest)));
 		let element = this;
 		let protoTree = getConstructorTree(Object.getPrototypeOf(this));
 		let propsConfig = buildConstructorPropsConfig(propertiesName,protoTree);
-		this[propsConfigSymbol] = propsConfig;
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
+		protectedAttributes = protectedAttributes.map(a=>a.toLowerCase());
+		let propsConfigByAttribute = this[propsConfigByAttributeSymbol] = {};
 		let hasDefaults = Object.keys(propertyDefaults).length>0;
 		Object.keys(propsConfig)
 		.sort((a,b)=>{
@@ -109,8 +100,14 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			return ao && !bo ? -1 : (!ao && bo ? 1 : 0);
 		})
 		.forEach((name)=>{
-			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It is a protected property.`);
 			let config = propsConfig[name];
+			if('attribute' in config && typeof config.attribute!='string') throw new Error(`Unable to setup property '${name}' on ${this.constructor.name}. Attribute is not a string.`);
+			let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+			let combinedName = name==attribute || name.toLowerCase()==attribute ? name : name+'/'+attribute;
+			config.propertyName = name;
+			propsConfigByAttribute[attribute] = config;
+			if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. '${name}' is a protected property.`);
+			if(protectedAttributes.indexOf(attribute)!==-1) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. '${attribute}' is a protected attribute.`);
 			if(config.overrideExisting!==true){
 				let propExists = false, protoPath = [];
 				for(let parentClass of protoTree){
@@ -123,7 +120,16 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 						}
 					}
 				}
-				if(propExists) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. It already exists on ${protoPath.join('=>')}.`);
+				if(propExists) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists on ${protoPath.join('=>')}.`);
+			}
+			if(name!==attribute && name.toLowerCase()!==attribute){
+				Object.keys(propsConfig).forEach((name2)=>{
+					if(name==name2) return;
+					let config2 = propsConfig[name2];
+					let attribute2 = ('attribute' in config2 ? config2.attribute+'' : name2).toLowerCase();
+					let combinedName2 = name2==attribute2 || name2.toLowerCase()==attribute2 ? name2 : name2+'/'+attribute2;
+					if(attribute==attribute2) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists as a different property/attribute '${combinedName2}'.`);
+				});
 			}
 			if(hasDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
 			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
@@ -132,8 +138,8 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			let reflectFromAttribute = !config.readOnly && ('reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean));
 			let transformToAttribute = typeof reflectToAttribute==='function' ? reflectToAttribute : null;
 			let transformFromAttribute = typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
-			if(transformToAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. reflectToAttribute callback does not work with the specified type.`);
-			if(transformFromAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${name}' on ${this.constructor.name}. reflectFromAttribute callback does not work with the specified type.`);
+			if(transformToAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. reflectToAttribute callback does not work with the specified type.`);
+			if(transformFromAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. reflectFromAttribute callback does not work with the specified type.`);
 			reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
 			let setDescriptors = [];
 			for(let classObj of protoTree){
@@ -141,7 +147,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 			}
 			let eProp = new elementProperty({
-				propertyStore, element, name, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
+				propertyStore, element, name, attribute, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
 			config.value = eProp.transformRawValue(config.value);
 			config[elementPropertySymbol] = eProp;
@@ -152,7 +158,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				value: eProp.get()
 			});
 			else Object.defineProperty(element,name,eProp);
-			let attribExists = this.hasAttribute(name);
+			let attribExists = this.hasAttribute(attribute);
 			let attribValue = eProp.getValueFromAttribute();
 			let reflectToAttributeInConstructor = 'reflectToAttributeInConstructor' in config ? !!config.reflectToAttributeInConstructor : true;
 			if(reflectToAttribute && reflectToAttributeInConstructor && !attribExists && config.value!==attribValue){
@@ -201,18 +207,18 @@ class elementProperty {
 	}
 	
 	getValueFromAttribute(){
-		let { element, name, isBoolean, isNumber, isString, transformFromAttribute, config } = this.props;
-		let hasAttribute = element.hasAttribute(name);
+		let { element, attribute, isBoolean, isNumber, isString, transformFromAttribute, config } = this.props;
+		let hasAttribute = element.hasAttribute(attribute);
 		if(isBoolean) return hasAttribute;
-		if(hasAttribute && (isNumber || isString)) return this.transformRawValue(element.getAttribute(name));
+		if(hasAttribute && (isNumber || isString)) return this.transformRawValue(element.getAttribute(attribute));
 		if(!config.readOnly && transformFromAttribute){
 			if(this.transformingFromAttribute) return;
 			this.transformingFromAttribute = true;
-			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(name) : null]);
+			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(attribute) : null]);
 			this.transformingFromAttribute = false;
 			return transformedValue;
 		}
-		if(hasAttribute) return element.getAttribute(name);
+		if(hasAttribute) return element.getAttribute(attribute);
 	}
 	
 	setValueViaAttribute(newValue){
@@ -236,19 +242,19 @@ class elementProperty {
 	}
 	
 	reflectValueToAttribute(newValue){
-		let { element, name, reflectToAttribute, transformToAttribute, isBoolean } = this.props;
+		let { element, attribute, reflectToAttribute, transformToAttribute, isBoolean } = this.props;
 		if(reflectToAttribute){
 			if(isBoolean){
-				let hasAttribute = element.hasAttribute(name);
-				if(!newValue && hasAttribute) element.removeAttribute(name);
-				if(newValue && !hasAttribute) element.setAttribute(name,'');
+				let hasAttribute = element.hasAttribute(attribute);
+				if(!newValue && hasAttribute) element.removeAttribute(attribute);
+				if(newValue && !hasAttribute) element.setAttribute(attribute,'');
 			}
 			else if(transformToAttribute){
 				let transformedValue = transformToAttribute.apply(element,[newValue]);
-				if(transformedValue===null) element.removeAttribute(name);
-				else element.setAttribute(name,transformedValue);
+				if(transformedValue===null) element.removeAttribute(attribute);
+				else element.setAttribute(attribute,transformedValue);
 			}
-			else element.setAttribute(name,newValue);
+			else element.setAttribute(attribute,newValue);
 		}
 	}
 	

@@ -7,6 +7,21 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 	
 	static get properties() {
 		return {
+			attrDiffProp: {
+				attribute: 'attrDiffAttribute',
+				type: String,
+				value: 'foo'
+			},
+			attrDiffProp2: {
+				attribute: 'attrDiffProp3',
+				type: String,
+				value: 'foo2'
+			},
+			attrDiffProp3: {
+				attribute: 'attrDiffProp2',
+				type: String,
+				value: 'foo3'
+			},
 			reflect1: {
 				type: String,
 				value: 'reflect1',
