@@ -21,11 +21,12 @@
     "start-server-and-test": "^1.14.0"
   },
   "scripts": {
-    "server": "npx --node-options=--no-deprecation http-server ./ -s -c-1 -p 8181",
-    "cypress": "npx cypress open",
-    "cypress+server": "npx start-server-and-test server http-get://localhost:8181 cypress",
-    "test": "npx start-server-and-test server http-get://localhost:8181 'npx cypress run'",
-    "watch:test": "npx start-server-and-test server http-get://localhost:8181 watch:test:cypress",
-    "watch:test:cypress": "npx nodemon --watch ./ --watch ./tests/ --exec cypress run"
+    "server": "npx --no --node-options=--no-deprecation http-server ./ -s -c-1 -p 8181",
+    "cypress": "npx --no cypress open",
+    "cypress+server": "npx --no start-server-and-test server http-get://localhost:8181 cypress",
+    "cypress:cli": "npx --no cypress run",
+    "test": "npx --no start-server-and-test server http-get://localhost:8181 cypress:cli",
+    "watch:test": "npx --no start-server-and-test server http-get://localhost:8181 watch:test:cypress",
+    "watch:test:cypress": "npx --no --node-options=--input-type=module nodemon --watch ./*.js --watch ./tests/ --exec npm run cypress:cli"
   }
 }
