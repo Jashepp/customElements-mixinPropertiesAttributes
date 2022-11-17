@@ -8,19 +8,19 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 ## What is this?
 
-This class mixin adds functionality to your web component (custom element) to help javascript properties and DOM element attributes be synchronised/reflected where configured. This allows for data-binding from both attributes and properties for a web component.
+This class mixin adds functionality to your [web components (custom elements v1)](https://web.dev/custom-elements-v1/) to help javascript properties and DOM element attributes be synchronised/reflected where configured. This allows automatic data-binding for both attributes and properties for a web component.
 
 This is written with vanilla JavaScript. No external dependencies required.
 
-No conflicting properties/methods are added to your class(es). The only properties/methods that are not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties, and an internal property with a `Symbol` key. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
+No conflicting properties/methods are added to your class(es). The only properties/methods that are not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties, and a non-enumerable `Symbol` property. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
 
 This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
 
-This was designed to help your web components follow the best practices mentioned on the [Google Developers Web Fundamentals Website](https://developers.google.com/web/fundamentals/web-components/customelements#properties_and_attributes).
+This was designed to help your [web components](https://web.dev/custom-elements-v1/) follow the [best practices](https://web.dev/custom-elements-best-practices/) mentioned on web.dev.
 
 ## Installation
 
-Note: This project is written with new ECMAScript features such as ESM, arrow functions, object destructuring and etc. You may need to use a transpiler / bundling application to have this be compatible on older browsers.
+Note: This project is written with new ECMAScript features such as ESM, arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs).
 
 Install via [NPM][npm-url]
 ```
@@ -367,6 +367,14 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 }
 ```
+
+### Upgrading web component
+
+Web components / custom elements are designed to be lazy loaded. So attributes and/or properties can exist or be set before the web component is defined/upgraded (`customElements.define`), and can also be set after it has been defined.
+
+When the element is first defined, this mixin will treat existing attributes and properties as changes if they differ from the default values for the configured properties.
+
+If both a same-named property **and** attribute exists before the element is defined, this mixin will prioritise the attribute's value. This is due to `attributeChangedCallback` receiving attribute-change notifications **after** the element has been defined. So in this case, if you want to change the value when both exist, before and during definition, then use `setAttribute`, as it will queue further changes for `attributeChangedCallback` to handle.
 
 ## Tests
 

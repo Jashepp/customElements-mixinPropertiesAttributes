@@ -146,11 +146,13 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
 				if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 			}
-			let eProp = new elementProperty({
+			let eProp = config[elementPropertySymbol] = new elementProperty({
 				propertyStore, element, name, attribute, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
-			config.value = eProp.transformRawValue(config.value);
-			config[elementPropertySymbol] = eProp;
+			let defaultValue = config.value = eProp.transformRawValue(config.value);
+			let existingDescriptor = Object.getOwnPropertyDescriptor(element,name);
+			let existingPropExists = existingDescriptor && existingDescriptor.enumerable;
+			let existingPropValue = existingPropExists ? eProp.transformRawValue(existingDescriptor.get ? existingDescriptor.get() : existingDescriptor.value) : void 0;
 			if(config.readOnly) Object.defineProperty(element,name,{
 				enumerable: eProp.enumerable,
 				configurable: eProp.configurable,
@@ -158,25 +160,33 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 				value: eProp.get()
 			});
 			else Object.defineProperty(element,name,eProp);
+			let reflectToAttributeInConstructor = 'reflectToAttributeInConstructor' in config ? !!config.reflectToAttributeInConstructor : true;
+			let delayChangeInConstructor = 'delayChangeInConstructor' in config ? !!config.delayChangeInConstructor : true;
 			let attribExists = this.hasAttribute(attribute);
 			let attribValue = eProp.getValueFromAttribute();
-			let reflectToAttributeInConstructor = 'reflectToAttributeInConstructor' in config ? !!config.reflectToAttributeInConstructor : true;
-			if(reflectToAttribute && reflectToAttributeInConstructor && !attribExists && config.value!==attribValue){
-				eProp.reflectValueToAttribute(config.value);
+			if(existingPropExists && attribExists) existingPropExists = false;
+			if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==attribValue){
+				eProp.reflectValueToAttribute(defaultValue); // Set default value
 			}
-			let delayChangeInConstructor = 'delayChangeInConstructor' in config ? !!config.delayChangeInConstructor : true;
+			if((existingPropExists && !attribExists && defaultValue!==existingPropValue) || (!existingPropExists && attribExists && defaultValue!==attribValue)){
+				propertyStore[name] = defaultValue; // Set default value
+			}
 			if(delayChangeInConstructor){
-				let initValue = config.value;
 				eProp.ignoreEmitChange = true;
 				Promise.resolve().then(()=>{
 					eProp.ignoreEmitChange = false;
 					let nowValue = eProp.get();
-					if(nowValue!==initValue && !eProp.firstChangeEmitted) eProp.emitChange(initValue,nowValue);
+					if(nowValue!==defaultValue && !eProp.firstChangeEmitted) eProp.emitChange(defaultValue,nowValue);
 				});
 			}
-			if(reflectFromAttribute && attribExists && config.value!==attribValue){
-				eProp.setValueViaAttribute(attribValue);
+			if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.props.reflectToAttribute = false;
+			if(existingPropExists && !attribExists && defaultValue!==existingPropValue){
+				eProp.set(existingPropValue); // Set new value
 			}
+			if(!existingPropExists && attribExists && reflectFromAttribute && defaultValue!==attribValue){
+				eProp.setValueViaAttribute(attribValue); // Set new value
+			}
+			if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.props.reflectToAttribute = true;
 			Object.freeze(config);
 		});
 	}
@@ -224,10 +234,9 @@ class elementProperty {
 	setValueViaAttribute(newValue){
 		let { element, isBoolean, transformFromAttribute, config } = this.props;
 		if(isBoolean) newValue = newValue!==null;
-		newValue = this.transformRawValue(newValue);
 		if(!config.readOnly && transformFromAttribute){
 			this.transformingFromAttribute = true;
-			newValue = transformFromAttribute.apply(element,[newValue]);
+			newValue = transformFromAttribute.apply(element,[this.transformRawValue(newValue)]);
 			this.transformingFromAttribute = false;
 		}
 		this.set(newValue);
