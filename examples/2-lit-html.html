@@ -45,8 +45,8 @@
 			}
 			
 			queueRender(){
-				if(this.renderQueued) return;
-				this.renderQueued = requestAnimationFrame(()=>{
+				if(this.renderQueued || !this.isConnected) return;
+				this.renderQueued = window.requestAnimationFrame(()=>{
 					litRender(this.render(), this.shadowRoot||this);
 					this.renderQueued = null;
 				});
