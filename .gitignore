@@ -1,4 +1,5 @@
-node_modules
 /.vscode/
 /cypress/
+/node_modules/
+/other/
 /package-lock.json

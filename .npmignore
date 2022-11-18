@@ -1,8 +1,9 @@
-node_modules
-/.vscode/
 /.github/
+/.vscode/
 /cypress/
-cypress.config.js
-/tests/
-/package-lock.json
 /examples/
+/node_modules/
+/other/
+/tests/
+/cypress.config.js
+/package-lock.json
