@@ -149,7 +149,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			let eProp = config[elementPropertySymbol] = new elementProperty({
 				propertyStore, element, name, attribute, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
-			let defaultValue = config.value = eProp.transformRawValue(config.value);
+			let defaultValue = config.value = eProp.transformRawValue('value' in config ? config.value : void 0);
 			let existingDescriptor = Object.getOwnPropertyDescriptor(element,name);
 			let existingPropExists = existingDescriptor && existingDescriptor.enumerable;
 			let existingPropValue = existingPropExists ? eProp.transformRawValue(existingDescriptor.get ? existingDescriptor.get() : existingDescriptor.value) : void 0;
@@ -168,8 +168,8 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==attribValue){
 				eProp.reflectValueToAttribute(defaultValue); // Set default value
 			}
-			if((existingPropExists && !attribExists && defaultValue!==existingPropValue) || (!existingPropExists && attribExists && defaultValue!==attribValue)){
-				propertyStore[name] = defaultValue; // Set default value
+			if((existingPropExists && !attribExists && defaultValue!==existingPropValue) || (!existingPropExists && attribExists && defaultValue!==attribValue) || (!existingPropExists && !attribExists && defaultValue!==void 0)){
+				if(!(name in propertyStore)) propertyStore[name] = defaultValue; // Set default value
 			}
 			if(delayChangeInConstructor){
 				eProp.ignoreEmitChange = true;
