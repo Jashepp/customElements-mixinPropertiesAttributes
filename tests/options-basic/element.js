@@ -58,6 +58,26 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 					return '_'+val;
 				}
 			},
+			reflectModifyOneWayToAttrib: {
+				reflectFromAttribute: function(val){
+					if(val==null) return void 0;
+					return val;
+				},
+				reflectToAttribute: function(val){
+					if(val==void 0) return null;
+					return 'toAttrib_'+val;
+				}
+			},
+			reflectModifyOneWayFromAttrib: {
+				reflectFromAttribute: function(val){
+					if(val==null) return void 0;
+					return 'fromAttrib_'+val;
+				},
+				reflectToAttribute: function(val){
+					if(val==void 0) return null;
+					return val;
+				}
+			},
 			reflectfnattribtransform1: {
 				reflectToAttribute: function(val){
 					if(val==='null') return null;

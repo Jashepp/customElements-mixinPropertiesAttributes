@@ -316,7 +316,7 @@ describe("Property Options",()=>{
 			.should('not.have.attr','delay8','');
 	});
 
-	it("Attribute Transformation - Change Value",()=>{
+	it("Attribute Transformation - Change Value - Both Ways",()=>{
 		cy.visit('/options-basic/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -328,6 +328,40 @@ describe("Property Options",()=>{
 				expect(e.reflectfnchangeval,'After Prop Change').to.eq('Changed');
 			})
 			.should('have.attr','reflectfnchangeval','_Changed');
+	});
+
+	it("Attribute Transformation - Change Value - One Way - To Attribute",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('not.have.attr','reflectModifyOneWayToAttrib','')
+			.then(([e])=>{
+				expect(e.reflectModifyOneWayToAttrib,'Property').to.eq(void 0);
+				e.reflectModifyOneWayToAttrib = 'SetViaProp';
+				expect(e.reflectModifyOneWayToAttrib,'Property').to.eq('SetViaProp');
+			})
+			.should('have.attr','reflectModifyOneWayToAttrib','toAttrib_SetViaProp')
+			.then(([e])=>{
+				e.setAttribute('reflectModifyOneWayToAttrib','SetViaAttrib');
+				expect(e.reflectModifyOneWayToAttrib,'Property').to.eq('SetViaAttrib');
+			})
+			.should('have.attr','reflectModifyOneWayToAttrib','toAttrib_SetViaAttrib')
+	});
+
+	it("Attribute Transformation - Change Value - One Way - From Attribute",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('not.have.attr','reflectModifyOneWayFromAttrib','')
+			.then(([e])=>{
+				expect(e.reflectModifyOneWayFromAttrib,'Property').to.eq(void 0);
+				e.reflectModifyOneWayFromAttrib = 'SetViaProp';
+				expect(e.reflectModifyOneWayFromAttrib,'Property').to.eq('SetViaProp');
+			})
+			.should('have.attr','reflectModifyOneWayFromAttrib','SetViaProp')
+			.then(([e])=>{
+				e.setAttribute('reflectModifyOneWayFromAttrib','SetViaAttrib');
+				expect(e.reflectModifyOneWayFromAttrib,'Property').to.eq('fromAttrib_SetViaAttrib');
+			})
+			.should('have.attr','reflectModifyOneWayFromAttrib','fromAttrib_SetViaAttrib')
 	});
 
 	it("Attribute Transformation - reflectToAttribute only",()=>{
@@ -378,23 +412,48 @@ describe("Property Options",()=>{
 			.should('have.attr','reflectfnattribtransform3','Test2')
 			.then(([e])=>{
 				e.setAttribute('reflectfnattribtransform3','undefined');
-				expect(e.reflectfnattribtransform3,'check undefined').to.eq('_undefined2');
+				expect(e,'prop: attr set "undefined"').to.have.property('reflectfnattribtransform3',void 0);
+				expect(e,'attr: attr set "undefined"').to.have.attr('reflectfnattribtransform3','_undefined2');
 				e.setAttribute('reflectfnattribtransform3','this');
-				expect(e.reflectfnattribtransform3,'this keyword').to.eq('hasThis');
+				expect(e,'prop: attr set "this"').to.have.property('reflectfnattribtransform3','hasThis');
+				expect(e,'attr: attr set "this"').to.have.attr('reflectfnattribtransform3','hasThis');
 				e.setAttribute('reflectfnattribtransform3', void 0);
-				expect(e.reflectfnattribtransform3,'Default Value').to.eq('_undefined2');
+				expect(e,'prop: attr set undefined').to.have.property('reflectfnattribtransform3',void 0);
+				expect(e,'attr: attr set undefined').to.have.attr('reflectfnattribtransform3','_undefined2');
 				e.removeAttribute('reflectfnattribtransform3');
-				expect(e.reflectfnattribtransform3,'Remove Attribute').to.eq('noAttribute');
+				expect(e,'prop: remove attr (set as null)').to.have.property('reflectfnattribtransform3','noAttribute');
+				expect(e,'attr: remove attr (set as null)').to.have.attr('reflectfnattribtransform3','noAttribute');
 				e.setAttribute('reflectfnattribtransform3','Something');
+				expect(e,'prop: attr set "Something"').to.have.property('reflectfnattribtransform3','Something');
+				expect(e,'attr: attr set "Something"').to.have.attr('reflectfnattribtransform3','Something');
 				e.setAttribute('reflectfnattribtransform3','previous');
-				expect(e.reflectfnattribtransform3,'Previous Value').to.eq('Something');
-				e.reflectfnattribtransform3 = 'null';
+				expect(e,'prop: attr set "previous"').to.have.property('reflectfnattribtransform3','Something');
+				expect(e,'attr: attr set "previous"').to.have.attr('reflectfnattribtransform3','previous');
 			})
-			.should('have.attr','reflectfnattribtransform3','noAttribute')
 			.then(([e])=>{
+				e.reflectfnattribtransform3 = 'undefined';
+				expect(e,'prop: prop set "undefined"').to.have.property('reflectfnattribtransform3','undefined');
+				expect(e,'attr: prop set "undefined"').to.have.attr('reflectfnattribtransform3','undefined');
+				e.reflectfnattribtransform3 = 'this';
+				expect(e,'prop: prop set "this"').to.have.property('reflectfnattribtransform3','this');
+				expect(e,'attr: prop set "this"').to.have.attr('reflectfnattribtransform3','this');
 				e.reflectfnattribtransform3 = void 0;
-			})
-			.should('have.attr','reflectfnattribtransform3','_undefined2');
+				expect(e,'prop: prop set undefined').to.have.property('reflectfnattribtransform3',void 0);
+				expect(e,'attr: prop set undefined').to.have.attr('reflectfnattribtransform3','_undefined2');
+				e.reflectfnattribtransform3 = null;
+				expect(e,'prop: remove set null').to.have.property('reflectfnattribtransform3',null);
+				expect(e,'attr: remove set null').to.not.have.attr('reflectfnattribtransform3');
+				e.reflectfnattribtransform3 = 'null';
+				expect(e,'prop: remove set "null"').to.have.property('reflectfnattribtransform3','null');
+				expect(e,'attr: remove set "null"').to.not.have.attr('reflectfnattribtransform3');
+				e.reflectfnattribtransform3 = 'Something';
+				expect(e,'prop: prop set "Something"').to.have.property('reflectfnattribtransform3','Something');
+				expect(e,'attr: prop set "Something"').to.have.attr('reflectfnattribtransform3','Something');
+				e.reflectfnattribtransform3 = 'previous';
+				expect(e,'prop: prop set "previous"').to.have.property('reflectfnattribtransform3','previous');
+				expect(e,'attr: prop set "previous"').to.have.attr('reflectfnattribtransform3','previous');
+
+			});
 	});
 
 	it("Read Only - String type with reflectToAttribute: false",()=>{
@@ -585,6 +644,7 @@ describe("Property Options",()=>{
 			.should('have.attr','prop3','prop3')
 			.then(([e])=>{
 				let list = e.onPropSetOrder;
+				expect(e.onPropSetOrder,'prop set order').to.deep.eq([ 'prop', 'prop2', 'prop3' ]);
 				let prop = list.indexOf('prop');
 				let prop2 = list.indexOf('prop2');
 				let prop3 = list.indexOf('prop3');

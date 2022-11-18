@@ -76,7 +76,13 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		if(attribute in propsConfigByAttribute){
 			let config = propsConfigByAttribute[attribute];
 			let eProp = config[elementPropertySymbol];
-			eProp.setValueViaAttribute(newValue);
+			let setValue = true;
+			if(attribute in eProp.skipNextAttribChange){
+				if(eProp.props.isBoolean && newValue!==null) newValue = true;
+				if(eProp.skipNextAttribChange[attribute]===eProp.transformRawValue(newValue)) setValue = false;
+				eProp.skipNextAttribChange[attribute] = void 0;
+			} 
+			if(setValue) eProp.setValueViaAttribute(newValue);
 		}
 	}
 	
@@ -164,6 +170,7 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			let delayChangeInConstructor = 'delayChangeInConstructor' in config ? !!config.delayChangeInConstructor : true;
 			let attribExists = this.hasAttribute(attribute);
 			let attribValue = eProp.getValueFromAttribute();
+			if(attribExists) eProp.skipNextAttribChange[attribute] = attribValue;
 			if(existingPropExists && attribExists) existingPropExists = false;
 			if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==attribValue){
 				eProp.reflectValueToAttribute(defaultValue); // Set default value
@@ -204,6 +211,7 @@ class elementProperty {
 		this.firstChangeEmitted = false;
 		this.ignoreEmitChange = false;
 		this.transformingFromAttribute = false;
+		this.skipNextAttribChange = {};
 	}
 	
 	get(){
@@ -253,6 +261,7 @@ class elementProperty {
 	reflectValueToAttribute(newValue){
 		let { element, attribute, reflectToAttribute, transformToAttribute, isBoolean } = this.props;
 		if(reflectToAttribute){
+			this.skipNextAttribChange[attribute] = newValue;
 			if(isBoolean){
 				let hasAttribute = element.hasAttribute(attribute);
 				if(!newValue && hasAttribute) element.removeAttribute(attribute);
@@ -260,6 +269,7 @@ class elementProperty {
 			}
 			else if(transformToAttribute){
 				let transformedValue = transformToAttribute.apply(element,[newValue]);
+				this.skipNextAttribChange[attribute] = transformedValue;
 				if(transformedValue===null) element.removeAttribute(attribute);
 				else element.setAttribute(attribute,transformedValue);
 			}
