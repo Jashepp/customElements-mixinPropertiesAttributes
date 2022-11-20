@@ -344,7 +344,7 @@ describe("Property Options",()=>{
 				e.setAttribute('reflectModifyOneWayToAttrib','SetViaAttrib');
 				expect(e.reflectModifyOneWayToAttrib,'Property').to.eq('SetViaAttrib');
 			})
-			.should('have.attr','reflectModifyOneWayToAttrib','toAttrib_SetViaAttrib')
+			.should('have.attr','reflectModifyOneWayToAttrib','SetViaAttrib')
 	});
 
 	it("Attribute Transformation - Change Value - One Way - From Attribute",()=>{
@@ -361,7 +361,7 @@ describe("Property Options",()=>{
 				e.setAttribute('reflectModifyOneWayFromAttrib','SetViaAttrib');
 				expect(e.reflectModifyOneWayFromAttrib,'Property').to.eq('fromAttrib_SetViaAttrib');
 			})
-			.should('have.attr','reflectModifyOneWayFromAttrib','fromAttrib_SetViaAttrib')
+			.should('have.attr','reflectModifyOneWayFromAttrib','SetViaAttrib')
 	});
 
 	it("Attribute Transformation - reflectToAttribute only",()=>{
@@ -413,16 +413,16 @@ describe("Property Options",()=>{
 			.then(([e])=>{
 				e.setAttribute('reflectfnattribtransform3','undefined');
 				expect(e,'prop: attr set "undefined"').to.have.property('reflectfnattribtransform3',void 0);
-				expect(e,'attr: attr set "undefined"').to.have.attr('reflectfnattribtransform3','_undefined2');
+				expect(e,'attr: attr set "undefined"').to.have.attr('reflectfnattribtransform3','undefined');
 				e.setAttribute('reflectfnattribtransform3','this');
 				expect(e,'prop: attr set "this"').to.have.property('reflectfnattribtransform3','hasThis');
-				expect(e,'attr: attr set "this"').to.have.attr('reflectfnattribtransform3','hasThis');
+				expect(e,'attr: attr set "this"').to.have.attr('reflectfnattribtransform3','this');
 				e.setAttribute('reflectfnattribtransform3', void 0);
 				expect(e,'prop: attr set undefined').to.have.property('reflectfnattribtransform3',void 0);
-				expect(e,'attr: attr set undefined').to.have.attr('reflectfnattribtransform3','_undefined2');
+				expect(e,'attr: attr set undefined').to.have.attr('reflectfnattribtransform3','undefined');
 				e.removeAttribute('reflectfnattribtransform3');
 				expect(e,'prop: remove attr (set as null)').to.have.property('reflectfnattribtransform3','noAttribute');
-				expect(e,'attr: remove attr (set as null)').to.have.attr('reflectfnattribtransform3','noAttribute');
+				expect(e,'attr: remove attr (set as null)').to.not.have.attr('reflectfnattribtransform3');
 				e.setAttribute('reflectfnattribtransform3','Something');
 				expect(e,'prop: attr set "Something"').to.have.property('reflectfnattribtransform3','Something');
 				expect(e,'attr: attr set "Something"').to.have.attr('reflectfnattribtransform3','Something');
