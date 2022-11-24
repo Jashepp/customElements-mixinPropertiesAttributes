@@ -123,6 +123,8 @@ Usage: `mixinPropertiesAttributes(base,[propertiesName='properties'])`
 Simply import this module and call the `mixinPropertiesAttributes` method while extending `HTMLElement` (or any class that already extends it).
 
 ```js
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
+
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 }
@@ -141,13 +143,16 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
 	static get properties() {
 		return {
+			// Property/Attribute Name
 			propName: {
-				type: String, // or propTypes.String for different behaviour
+				// All options are optional
+				type: String, // or propTypes.String for newer behaviour
 				value: 'World',
 				reflectToAttribute: true,
-				reflectFromAttribute: true
+				reflectFromAttribute: true,
+				reflectFromProperty: true,
 			},
-			// Additional properties with configs
+			// Additional configurations
 		};
 	}
 	// ...
@@ -158,15 +163,17 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 
 | Property Config Option | Description (when `true` or specified) | Default Value |
 |-|-|-|
-| `type` | The type of property/attribute. `String`, `Number`, `Boolean` (the actual object/keyword) or undefined for any other type. See [Property Types](#property-types). | `undefined` |
+| `type` | The type of property/attribute. Either use `String`, `Number`, `Boolean` (the actual object/keyword) or any type on `propTypes`. See [Property Types](#property-types). | `undefined` |
 | `attribute` | Overwrite attribute name to differ from property name. See [Alternate Attribute Name](#alternate-attribute-name) | Property Name |
-| `value` | The default value of the property/attribute.  See [Default Value](#default-value). | `undefined` |
-| `reflectToAttribute` | `true`: Sync changes on the property to the attribute. See [Attribute Reflection](#attribute-reflection). | Automatic |
-| `reflectToAttribute` | `function`: [Transform value](#attribute-transformation) before being set as the attribute (`type` must not be valid). See [Attribute Reflection](#attribute-reflection). | - |
-| `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. See [Attribute Reflection](#attribute-reflection). | Automatic |
-| `reflectFromAttribute` | `function`: [Transform value](#attribute-transformation) after reading from the attribute (`type` must not be valid). See [Attribute Reflection](#attribute-reflection). | - |
-| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value. See [Attribute Reflection](#attribute-reflection). | `true` if `reflectToAttribute` |
-| `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. See [Attribute Reflection](#attribute-reflection). | `false` |
+| `value` | The default value of the property/attribute. See [Default Value](#default-value). | `undefined` |
+| `reflectToAttribute` | `true`: Sync changes on the property to the attribute. See [Data Reflection](#data-reflection). | Automatic |
+| `reflectToAttribute` | `function`: [Transform value](#data-transformation) before being set as the attribute (`type` must not be valid). See [Data Reflection](#data-reflection). | - |
+| `reflectFromAttribute` | `true`: Sync changes on the attribute to the property. See [Data Reflection](#data-reflection). | Automatic |
+| `reflectFromAttribute` | `function`: [Transform value](#data-transformation) after reading from the attribute (`type` must not be valid). See [Data Reflection](#data-reflection). | - |
+| `reflectFromProperty` | `true`: Sync changes on from the property being set, to the property. See [Data Reflection](#data-reflection). | Automatic |
+| `reflectFromProperty` | `function`: [Transform value](#data-transformation) after reading from the attribute (`type` must not be valid). See [Data Reflection](#data-reflection). | - |
+| `reflectToAttributeInConstructor` | Sets attribute in constructor when differs from default value. See [Data Reflection](#data-reflection). | `true` if `reflectToAttribute` |
+| `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. See [Data Reflection](#data-reflection). | `false` |
 | `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor. See [Configuring Value Changes](#configuring-value-changes). | `true` |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See [Configuring Value Changes](#configuring-value-changes). | - |
 | `notify` | Emits a *propName*`-changed` event on the class. See [Configuring Value Changes](#configuring-value-changes). | `false` |
@@ -175,11 +182,19 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 
 #### Property Types
 
-For `String` types, the mixin tries to keep the property as a string. `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
+`propTypes.Boolean`: Value is converted with [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is `true` when the attribute exists, and `false` when the attribute does not exist (assuming the attribute is being reflected to/from the property).
 
-For `Number` types, the mixin tries to keep the property as a number. `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`. Failed conversions may result with `NaN`.
+`propTypes.StringLegacy` or `String` object/keyword: `Null` and `Undefined` are converted to an empty string `''`, and all other data types are converted by `''+value`.
 
-For `Boolean` types, the mixin tries to keep the property as a boolean. All data types are converted via [truey/falsy](https://bonsaiden.github.io/JavaScript-Garden/#types.equality) conversion via `!!value`. The property is `true` when the attribute exists, and `false` when the attribute does not exist (assuming the attribute is being reflected to/from the property).
+`propTypes.NumberLegacy` or `Number` object/keyword: `Null` and `Undefined` are converted to the number `0`, and all other data types are converted by `Number(value)`. Failed conversions may result with `NaN`.
+
+`propTypes.String`: Can be either `null` or `string`. If the property is set to `null` or `undefined`, or if the attribute doesn't exist, it will be set as `null`. If the property is set as anything else, or if the attribute exists, it will be transformed via `''+value`.
+
+`propTypes.Number`: Can be either `null` or `number`. If the property is set to `null`, or if the attribute doesn't exist, it will be set as `null`. If the property is set as anything else, or if the attribute exists, it will be transformed via `Number(value)` to be either a number, or `null` (if it resulted in `NaN`).
+
+Use the types specified on `propTypes` for future compatibility. The next major release *might* change `String` and `Number` objects/keywords to use the newer `propTypes.String` and `propTypes.Number` types.
+
+You may also use your own type, if it has these 3 functions: `toAttribute`, `fromAttribute`, `fromProperty`. These are essentially the same as `reflectToAttribute`, `reflectFromAttribute`, and `reflectFromProperty`, respectively. See [Data Reflection](#data-reflection).
 
 #### Alternate Attribute Name
 
@@ -187,19 +202,27 @@ If `attribute` is different than the property name, the property-attribute bindi
 
 #### Default Value
 
-Upon construction (initialisation of the element), if an attribute **exists** on the element, and it **differs** from the default value, it will [cause a change](#watching-for-changes). **Except** when `reflectToAttribute` is `false` (or fn results with `null`). If the attribute does **not exist** on the element, yet there is a default value, the attribute will be added to the element. **Except** for `Boolean` when `false`, when `reflectToAttribute` is `false` (or fn results with `null`), or when `reflectToAttributeInConstructor` is `false`.
+Upon construction (initialisation/upgrade of the element), if an attribute **exists** on the element, and it **differs** from the default value, it will [cause a change](#watching-for-changes). **Except** when `reflectToAttribute` is `false` (or fn results with `null`). If the attribute does **not exist** on the element, yet there is a default value, the attribute will be added to the element. **Except** for `Boolean` when `false`, when `reflectToAttribute` is `false` (or fn results with `null`), or when `reflectToAttributeInConstructor` is `false`.
 
-#### Attribute Reflection
+The same applies if a property **exists** on the element upon construction. Where `reflectFromProperty` is used instead, and a property is set instead of an attribute.
 
-For `String`, `Number` and `Boolean` types, the `reflectToAttribute` and `reflectFromAttribute` options will default to `true`. It will default to `false` for all other types.
+If both an attribute and property exist on the element upon construction, see [Upgrading web component](#upgrading-web-component).
 
-If the `reflectToAttribute` and/or `reflectFromAttribute` options are function callbacks, the [attribute will be transformed](#attribute-transformation). If `type` is also `String`, `Number` or `Boolean`, an error will be thrown.
+`reflectFromProperty` will transform the `value` option before it's set as the property's default value. If `reflectFromProperty` is `false`, no default value will be set from the `value` option.
 
-The `reflectToAttributeInConstructor` option, when `false`, prevents the default value being set as an attribute during constructor. Handy for hidden attributes with default values.
+#### Data Reflection
 
-If both the `readOnly` and `reflectToAttribute` options are `true`, the attribute will be set upon construction.
+For data transformation, see [Data Transformation](#data-transformation).
 
-If `readOnly` is `true`, and the attribute's value is changed, the property will remain unchanged, so no [changes](#watching-for-changes) will be emitted.
+`reflectToAttribute`, `reflectFromAttribute` and `reflectFromProperty` default to `true` on a valid `type`. If they're set as `false`, it will simply disable the respective reflect method, so data transformation will not happen, and the attribute or property will not be set/changed.
+
+If no `type` is specified, `reflectFromProperty` will default to `true`, so setting the property can be possible.
+
+If `readOnly` is `true`, `reflectFromAttribute` and `reflectFromProperty` will default to `false`.
+
+If `readOnly` is `true`, and the attribute's value or property's value is **changed**, the property will **remain unchanged**, so no [changes](#watching-for-changes) will be emitted.
+
+If `reflectToAttributeInConstructor` is `false`, the attribute will not be set during constructor. Handy for hidden attributes with default values.
 
 #### Configuring Value Changes
 
@@ -221,17 +244,25 @@ It is recommended to use a `set` descriptor to listen for changes. See '[Watchin
 | `newValue` | The new value. |
 | `oldValue` | The old value. |
 
-#### Attribute Transformation:
+#### Data Transformation:
 
-If `type` is not specified, `reflectToAttribute` and `reflectFromAttribute` can be used as functions to transform the attribute before being set, or after being read.
+This mixin allows transform functions to determine what values get transformed to, when setting via an attribute, via a property, or when converting from property to attribute.
+
+`reflectToAttribute` runs when an attribute is being set, and transforms the property value to an attribute value. When it results with `null`, the attribute will not exist or be removed.
+
+`reflectFromAttribute` runs when fetching the value from the attribute or when the attribute is being set, and transforms the attribute value to a property value. When the attribute doesn't exist, or is removed, `null` is passed as the `value` argument.
+
+`reflectFromProperty` runs when the property is being set, and transforms the setting property value to the actual property value. For example, when the default value is used, or when the property is `set` on the custom element.
+
+If not specified, or when `true`, these options fallback to the type's `toAttribute`, `fromAttribute` and `fromProperty` transform functions, which behave the exact same way, respectively.
+
+If any are specified as functions on the property/attribute config, they will override the type's transform functions. For example, you can use `type: mixinTypes.Boolean`, with `reflectFromAttribute: (v)=>{ return v==null||v=='off'||v=='no'||v=='false' ? false : true; },` to allow specific attribute strings to be transformed differently. If all are specified as functions, then having `type` also set is redundant.
+
+If any are specified with no `type` set, it will treat the other options as `false`. See [Data Reflection](#data-reflection) for `true`/`false` reflect options.
 
 The transform callbacks take one argument (the value), with the `this` keyword as the element.
 
-On `reflectFromAttribute`, if the returned value is `undefined`, the configured default value will be used. The argument is `null` if the attribute doesn't exist.
-
-On `reflectToAttribute`, if the returned value is `null`, the attribute will be removed.
-
-Transform Example:
+Transform Example (with no `type` option):
 
 ```js
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
@@ -248,7 +279,8 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 				// Add _ prefix
 				reflectToAttribute: function(val){
 					return '_'+val;
-				}
+				},
+				// reflectFromProperty will simply pass through by default
 			},
 			// Additional properties with configs
 		};
@@ -370,7 +402,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 Web components / custom elements are designed to be lazy loaded. So attributes and/or properties can exist or be set before the web component is defined/upgraded (`customElements.define`), and can also be set after it has been defined.
 
-When the element is first defined, this mixin will treat existing attributes and properties as changes if they differ from the default values for the configured properties.
+When the element is first defined, this mixin will treat existing attributes and properties as changes if they differ from the default values for the configured properties.  See [Default Value](#default-value).
 
 If both a same-named property **and** attribute exists before the element is defined, this mixin will prioritise the attribute's value. This is due to `attributeChangedCallback` receiving attribute-change notifications **after** the element has been defined. So in this case, if you want to change the value when both exist, before and during definition, then use `setAttribute`, as it will queue further changes for `attributeChangedCallback` to handle.
 
