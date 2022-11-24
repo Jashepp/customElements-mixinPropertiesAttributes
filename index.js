@@ -9,67 +9,62 @@
  * Github: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
  */
 
-const getConstructorTree = (topClass)=>{
-	let protoTree = [], parentClass = null;
-	while(true){
-		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
-		if(!parentClass || !parentClass.constructor || parentClass.constructor===HTMLElement || parentClass.constructor===Function || parentClass.constructor===Object || parentClass.constructor===parentClass.constructor.constructor) break;
-		protoTree.push(parentClass);
-	}
-	return protoTree;
-}
-
-const getProtoTree = (topClass)=>{
-	let protoTree = [], parentClass = null;
-	while(true){
-		parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
-		if(!parentClass || parentClass===HTMLElement || parentClass===Function || parentClass===Object || parentClass===parentClass.constructor) break;
-		protoTree.push(parentClass);
-	}
-	return protoTree;
-}
-
-const buildProtoPropsConfig = (propertiesName,protoTree)=>{
-	let propsConfig = {};
-	for(let parentClass of [...protoTree].reverse()){
-		if(parentClass.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass[propertiesName]);
-	}
-	return propsConfig;
-};
-
-const buildConstructorPropsConfig = (propertiesName,protoTree)=>{
-	let propsConfig = {};
-	for(let parentClass of [...protoTree].reverse()){
-		if(parentClass.constructor.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass.constructor[propertiesName]);
-	}
-	return propsConfig;
-};
-
 const propsConfigByAttributeSymbol = Symbol('mixinProps-propsConfigByAttribute');
 const elementPropertySymbol = Symbol('mixinProps-elementProperty');
 
-/**
- * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
- * @param HTMLElement base class to apply mixin to
- * @param String propertiesName Optional: 'static get' method name for configuration of properties. Default: 'properties'
- */
-export const mixinPropertiesAttributes = (base,propertiesName='properties') => class mixinPropertiesAttributes extends base {
+export class mixinClass {
+
+	static getConstructorTree(topClass){
+		let protoTree = [], parentClass = null;
+		while(true){
+			parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
+			if(!parentClass || !parentClass.constructor || parentClass.constructor===HTMLElement || parentClass.constructor===Function || parentClass.constructor===Object || parentClass.constructor===parentClass.constructor.constructor) break;
+			protoTree.push(parentClass);
+		}
+		return protoTree;
+	}
 	
-	static get observedAttributes() {
-		let attributeArr = [], propsConfig = buildProtoPropsConfig(propertiesName,getProtoTree(this));
+	static getProtoTree(topClass){
+		let protoTree = [], parentClass = null;
+		while(true){
+			parentClass = parentClass===null ? topClass : Object.getPrototypeOf(parentClass);
+			if(!parentClass || parentClass===HTMLElement || parentClass===Function || parentClass===Object || parentClass===parentClass.constructor) break;
+			protoTree.push(parentClass);
+		}
+		return protoTree;
+	}
+	
+	static buildProtoPropsConfig(propertiesName,protoTree){
+		let propsConfig = {};
+		for(let parentClass of [...protoTree].reverse()){
+			if(parentClass.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass[propertiesName]);
+		}
+		return propsConfig;
+	};
+	
+	static buildConstructorPropsConfig(propertiesName,protoTree){
+		let propsConfig = {};
+		for(let parentClass of [...protoTree].reverse()){
+			if(parentClass.constructor.hasOwnProperty(propertiesName)) propsConfig = Object.assign(propsConfig,parentClass.constructor[propertiesName]);
+		}
+		return propsConfig;
+	};
+
+	static ce_observedAttributes(propertiesName){
+		let propsConfig = mixinClass.buildProtoPropsConfig(propertiesName,mixinClass.getProtoTree(this));
 		return Object.keys(propsConfig).filter(name=>{
 			let config = propsConfig[name];
 			if(config.readOnly) return false;
-			let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
-			let safeAttributeType = config.type===String || config.type===Number || config.type===Boolean;
-			let observe = 'reflectFromAttribute' in config ? !!config.reflectFromAttribute : safeAttributeType;
-			if(observe) attributeArr.push(attribute);
-			return observe;
-		}).concat(attributeArr,super.observedAttributes || []);
+			if('reflectFromAttribute' in config) return !!config.reflectFromAttribute;
+			if(config.type===String || config.type===Number || config.type===Boolean) return true;
+			return false;
+		}).map(name=>{
+			let config = propsConfig[name];
+			return ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+		});
 	}
-	
-	attributeChangedCallback(attribute,oldValue,newValue){
-		if(super.attributeChangedCallback) super.attributeChangedCallback(attribute,oldValue,newValue);
+
+	static ce_attributeChangedCallback(attribute,oldValue,newValue){
 		if(oldValue===newValue) return;
 		let propsConfigByAttribute = this[propsConfigByAttributeSymbol];
 		attribute = attribute.toLowerCase();
@@ -86,12 +81,11 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 		}
 	}
 	
-	constructor(argOptions={},...argRest) {
-		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, superArguments=[], propertyDefaults={} } = Object(argOptions);
-		super(...([].concat(superArguments,argRest)));
+	static ce_mixinConstructor(argOptions,propertiesName){
+		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = Object(argOptions);
 		let element = this;
-		let protoTree = getConstructorTree(Object.getPrototypeOf(this));
-		let propsConfig = buildConstructorPropsConfig(propertiesName,protoTree);
+		let protoTree = mixinClass.getConstructorTree(Object.getPrototypeOf(this));
+		let propsConfig = mixinClass.buildConstructorPropsConfig(propertiesName,protoTree);
 		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
@@ -197,8 +191,36 @@ export const mixinPropertiesAttributes = (base,propertiesName='properties') => c
 			Object.freeze(config);
 		});
 	}
+
+	static applyCEMixin(base,propertiesName='properties'){
+		return class mixinPropertiesAttributes extends (base||HTMLElement) {
 	
-};
+			static get observedAttributes() {
+				return (super.observedAttributes||[]).concat(mixinClass.ce_observedAttributes.apply(this,[propertiesName]));
+			}
+			
+			attributeChangedCallback(attribute,oldValue,newValue){
+				if(super.attributeChangedCallback) super.attributeChangedCallback(attribute,oldValue,newValue);
+				return mixinClass.ce_attributeChangedCallback.apply(this,[attribute,oldValue,newValue]);
+			}
+			
+			constructor(argOptions={},...argRest) {
+				super(...(Object(argOptions).superArguments||[]),...argRest);
+				mixinClass.ce_mixinConstructor.apply(this,[argOptions,propertiesName]);
+			}
+			
+		};
+	}
+	
+}
+Object.freeze(mixinClass);
+
+/**
+ * Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
+ * @param HTMLElement base class to apply mixin to
+ * @param String propertiesName Optional: 'static get' method name for configuration of properties. Default: 'properties'
+ */
+export const mixinPropertiesAttributes = mixinClass.applyCEMixin;
 
 class elementProperty {
 	
@@ -211,6 +233,7 @@ class elementProperty {
 		this.firstChangeEmitted = false;
 		this.ignoreEmitChange = false;
 		this.transformingFromAttribute = false;
+		this.settingViaAttribute = false;
 		this.skipNextAttribChange = {};
 	}
 	
