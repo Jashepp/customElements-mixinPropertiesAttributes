@@ -9,10 +9,14 @@
  * Github: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
  */
 
-const propsConfigByAttributeSymbol = Symbol('mixinProps-propsConfigByAttribute');
-const elementPropertySymbol = Symbol('mixinProps-elementProperty');
+const symbols = Object.freeze({
+	propsConfigByAttribute: Symbol('mixinProps-propsConfigByAttribute'),
+	elementProperty: Symbol('mixinProps-elementProperty'),
+});
 
 export class mixinClass {
+
+	static get symbols(){ return symbols; }
 
 	static getConstructorTree(topClass){
 		let protoTree = [], parentClass = null;
@@ -57,6 +61,7 @@ export class mixinClass {
 			if(config.readOnly) return false;
 			if('reflectFromAttribute' in config) return !!config.reflectFromAttribute;
 			if(config.type===String || config.type===Number || config.type===Boolean) return true;
+			if(config.type && 'fromAttribute' in config.type) return !!config.type.fromAttribute;
 			return false;
 		}).map(name=>{
 			let config = propsConfig[name];
@@ -66,17 +71,16 @@ export class mixinClass {
 
 	static ce_attributeChangedCallback(attribute,oldValue,newValue){
 		if(oldValue===newValue) return;
-		let propsConfigByAttribute = this[propsConfigByAttributeSymbol];
+		let propsConfigByAttribute = this[mixinClass.symbols.propsConfigByAttribute];
 		attribute = attribute.toLowerCase();
 		if(attribute in propsConfigByAttribute){
 			let config = propsConfigByAttribute[attribute];
-			let eProp = config[elementPropertySymbol];
+			let eProp = config[mixinClass.symbols.elementProperty];
 			let setValue = true;
 			if(attribute in eProp.skipNextAttribChange){
-				if(eProp.props.isBoolean && newValue!==null) newValue = true;
-				if(eProp.skipNextAttribChange[attribute]===eProp.transformRawValue(newValue)) setValue = false;
+				if(eProp.skipNextAttribChange[attribute]===newValue) setValue = false;
 				eProp.skipNextAttribChange[attribute] = void 0;
-			} 
+			}
 			if(setValue) eProp.setValueViaAttribute(newValue);
 		}
 	}
@@ -91,8 +95,8 @@ export class mixinClass {
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
 		protectedAttributes = protectedAttributes.map(a=>a.toLowerCase());
-		let propsConfigByAttribute = this[propsConfigByAttributeSymbol] = {};
-		let hasDefaults = Object.keys(propertyDefaults).length>0;
+		let propsConfigByAttribute = this[mixinClass.symbols.propsConfigByAttribute] = {};
+		let hasConfigDefaults = Object.keys(propertyDefaults).length>0;
 		Object.keys(propsConfig)
 		.sort((a,b)=>{
 			let ac = propsConfig[a], bc = propsConfig[b], ao = 'order' in ac, bo = 'order' in bc;
@@ -131,28 +135,55 @@ export class mixinClass {
 					if(attribute==attribute2) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists as a different property/attribute '${combinedName2}'.`);
 				});
 			}
-			if(hasDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
+			if(hasConfigDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
 			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
-			let isString = config.type===String, isNumber = config.type===Number, isBoolean = config.type===Boolean;
-			let reflectToAttribute = 'reflectToAttribute' in config ? config.reflectToAttribute : (isString || isNumber || isBoolean);
-			let reflectFromAttribute = !config.readOnly && ('reflectFromAttribute' in config ? config.reflectFromAttribute : (isString || isNumber || isBoolean));
-			let transformToAttribute = typeof reflectToAttribute==='function' ? reflectToAttribute : null;
-			let transformFromAttribute = typeof reflectFromAttribute==='function' ? reflectFromAttribute : null;
-			if(transformToAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. reflectToAttribute callback does not work with the specified type.`);
-			if(transformFromAttribute && (isString || isNumber || isBoolean)) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. reflectFromAttribute callback does not work with the specified type.`);
-			reflectToAttribute = !!reflectToAttribute; reflectFromAttribute = !!reflectFromAttribute;
+			if(config.type===String) config.type = propTypes.StringLegacy;
+			if(config.type===Number) config.type = propTypes.NumberLegacy;
+			if(config.type===Boolean) config.type = propTypes.Boolean;
+			if(typeof config.type==='function') config.type = config.type.apply(Object.create(config),[]);
+			let reflectToAttribute = false, reflectFromAttribute = false, reflectFromProperty = false;
+			let transformToAttribute = null, transformFromAttribute = null, transformFromProperty = null;
+			if(config.type){
+				if(!config.type.toAttribute || !(typeof config.type.toAttribute==='function') || !config.type.fromAttribute || !(typeof config.type.fromAttribute==='function') || !config.type.fromProperty || !(typeof config.type.fromProperty==='function')) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. Type has missing or invalid toAttribute, fromAttribute or fromProperty transform functions.`);
+				transformToAttribute = config.type.toAttribute;
+				transformFromAttribute = config.type.fromAttribute;
+				transformFromProperty = config.type.fromProperty;
+				reflectToAttribute = reflectFromAttribute = reflectFromProperty = true;
+			}
+			if('reflectToAttribute' in config){
+				reflectToAttribute = !!config.reflectToAttribute;
+				if(typeof config.reflectToAttribute==='function') transformToAttribute = config.reflectToAttribute;
+				else if(!config.reflectToAttribute) transformToAttribute = null;
+			}
+			if(config.readOnly){ reflectFromAttribute = false; transformFromAttribute = null; }
+			else if('reflectFromAttribute' in config){
+				reflectFromAttribute = !!config.reflectFromAttribute;
+				if(typeof config.reflectFromAttribute==='function') transformFromAttribute = config.reflectFromAttribute;
+				else if(!config.reflectFromAttribute) transformFromAttribute = null;
+			}
+			if(config.readOnly){ reflectFromProperty = false; transformFromProperty = null; }
+			else if('reflectFromProperty' in config){
+				reflectFromProperty = !!config.reflectFromProperty;
+				if(typeof config.reflectFromProperty==='function') transformFromProperty = config.reflectFromProperty;
+				else if(!config.reflectFromProperty) transformFromProperty = null;
+			}
+			else if(!config.type && !reflectFromProperty) reflectFromProperty = true; // Backwards compatibility & default behavior
 			let setDescriptors = [];
 			for(let classObj of protoTree){
 				let descriptor = Object.getOwnPropertyDescriptor(classObj,name);
 				if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 			}
-			let eProp = config[elementPropertySymbol] = new elementProperty({
-				propertyStore, element, name, attribute, isBoolean, isNumber, isString, config, reflectFromAttribute, reflectToAttribute, transformFromAttribute, transformToAttribute, onPropertySet, hasObserver, isObserverString, setDescriptors
+			let eProp = config[mixinClass.symbols.elementProperty] = new elementProperty({
+				propertyStore, element, name, attribute, config, reflectToAttribute, reflectFromAttribute, reflectFromProperty, transformToAttribute, transformFromAttribute, transformFromProperty, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
-			let defaultValue = config.value = eProp.transformRawValue('value' in config ? config.value : void 0);
+			if(transformFromProperty){
+				config.value = transformFromProperty.apply(element,['value' in config ? config.value : void 0]);
+			}
+			let defaultValue = config.value;
 			let existingDescriptor = Object.getOwnPropertyDescriptor(element,name);
 			let existingPropExists = existingDescriptor && existingDescriptor.enumerable;
-			let existingPropValue = existingPropExists ? eProp.transformRawValue(existingDescriptor.get ? existingDescriptor.get() : existingDescriptor.value) : void 0;
+			let existingPropValue = existingPropExists ? (existingDescriptor.get ? existingDescriptor.get() : existingDescriptor.value) : void 0;
+			if(existingPropExists && transformFromProperty) existingPropValue = transformFromProperty.apply(element,[existingPropValue]);
 			if(config.readOnly) Object.defineProperty(element,name,{
 				enumerable: eProp.enumerable,
 				configurable: eProp.configurable,
@@ -166,7 +197,7 @@ export class mixinClass {
 			let attribValue = eProp.getValueFromAttribute();
 			if(attribExists) eProp.skipNextAttribChange[attribute] = attribValue;
 			if(existingPropExists && attribExists) existingPropExists = false;
-			if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==attribValue){
+			if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==null){
 				eProp.reflectValueToAttribute(defaultValue); // Set default value
 			}
 			if((existingPropExists && !attribExists && defaultValue!==existingPropValue) || (!existingPropExists && attribExists && defaultValue!==attribValue) || (!existingPropExists && !attribExists && defaultValue!==void 0)){
@@ -181,7 +212,7 @@ export class mixinClass {
 				});
 			}
 			if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.props.reflectToAttribute = false;
-			if(existingPropExists && !attribExists && defaultValue!==existingPropValue){
+			if(existingPropExists && !attribExists && reflectFromProperty && defaultValue!==existingPropValue){
 				eProp.set(existingPropValue); // Set new value
 			}
 			if(!existingPropExists && attribExists && reflectFromAttribute && defaultValue!==attribValue){
@@ -222,6 +253,35 @@ Object.freeze(mixinClass);
  */
 export const mixinPropertiesAttributes = mixinClass.applyCEMixin;
 
+export const propTypes = {
+	Boolean: {
+		toAttribute: (v)=>{ return v ? '' : null; },
+		fromAttribute: (v)=>{ return v===null ? false : true; },
+		fromProperty: (v)=>{ return !!v; },
+	},
+	String: {
+		toAttribute: (v)=>{ return v===null || v==='' ? null : ''+v; },
+		fromAttribute: (v)=>{ return v==null || v==='' ? null : ''+v; },
+		fromProperty: (v)=>{ return v===null || v==='' || v===void 0 ? '' : ''+v; },
+	},
+	StringLegacy: {
+		toAttribute: (v)=>{ return v===null ? '' : ''+v; },
+		fromAttribute: (v)=>{ return v==null ? '' : ''+v; },
+		fromProperty: (v)=>{ return v===null || v===void 0 ? '' : ''+v; },
+	},
+	Number: {
+		toAttribute: (v)=>{ return v===null ? null : ''+v; },
+		fromAttribute: (v)=>{ v = Number(v); return Number.isNaN(v) ? null : v; },
+		fromProperty: (v)=>{ v = Number(v); return Number.isNaN(v) ? null : v; },
+	},
+	NumberLegacy: {
+		toAttribute: (v)=>{ return Number(v) },
+		fromAttribute: (v)=>{ return Number(v) },
+		fromProperty: (v)=>{ return v===void 0 ? 0 : Number(v) },
+	},
+};
+Object.freeze(propTypes);
+
 class elementProperty {
 	
 	constructor(props){
@@ -248,11 +308,10 @@ class elementProperty {
 	}
 	
 	getValueFromAttribute(){
-		let { element, attribute, isBoolean, isNumber, isString, transformFromAttribute, config } = this.props;
+		let { element, attribute, transformFromAttribute, config } = this.props;
+		if(config.readOnly) return;
 		let hasAttribute = element.hasAttribute(attribute);
-		if(isBoolean) return hasAttribute;
-		if(hasAttribute && (isNumber || isString)) return this.transformRawValue(element.getAttribute(attribute));
-		if(!config.readOnly && transformFromAttribute){
+		if(transformFromAttribute){
 			if(this.transformingFromAttribute) return;
 			this.transformingFromAttribute = true;
 			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(attribute) : null]);
@@ -263,36 +322,24 @@ class elementProperty {
 	}
 	
 	setValueViaAttribute(newValue){
-		let { element, isBoolean, transformFromAttribute, config } = this.props;
-		if(isBoolean) newValue = newValue!==null;
-		if(!config.readOnly && transformFromAttribute){
+		let { element, transformFromAttribute, config } = this.props;
+		if(config.readOnly) return;
+		if(transformFromAttribute){
 			this.transformingFromAttribute = true;
-			newValue = transformFromAttribute.apply(element,[this.transformRawValue(newValue)]);
+			newValue = transformFromAttribute.apply(element,[newValue]);
 			this.transformingFromAttribute = false;
 		}
+		this.settingViaAttribute = true;
 		this.set(newValue);
 	}
 	
-	transformRawValue(value){
-		let { isBoolean, isNumber, isString } = this.props;
-		if(isBoolean) value = !!value;
-		else if(isNumber) value = value===void 0 ? 0 : Number(value);
-		else if(isString) value = value===null || value===void 0 ? '' : ''+value;
-		return value;
-	}
-	
 	reflectValueToAttribute(newValue){
-		let { element, attribute, reflectToAttribute, transformToAttribute, isBoolean } = this.props;
+		let { element, attribute, reflectToAttribute, transformToAttribute } = this.props;
 		if(reflectToAttribute){
-			this.skipNextAttribChange[attribute] = newValue;
-			if(isBoolean){
-				let hasAttribute = element.hasAttribute(attribute);
-				if(!newValue && hasAttribute) element.removeAttribute(attribute);
-				if(newValue && !hasAttribute) element.setAttribute(attribute,'');
-			}
-			else if(transformToAttribute){
+			this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
+			if(transformToAttribute){
 				let transformedValue = transformToAttribute.apply(element,[newValue]);
-				this.skipNextAttribChange[attribute] = transformedValue;
+				this.skipNextAttribChange[attribute] = transformedValue===null ? null : ''+transformedValue;
 				if(transformedValue===null) element.removeAttribute(attribute);
 				else element.setAttribute(attribute,transformedValue);
 			}
@@ -301,13 +348,18 @@ class elementProperty {
 	}
 	
 	set(newValue){
-		let { propertyStore, element, name, reflectToAttribute } = this.props;
-		newValue = this.transformRawValue(newValue);
+		let { propertyStore, element, name, reflectToAttribute, reflectFromProperty, transformFromProperty } = this.props;
+		let settingViaAttribute = this.settingViaAttribute;
+		this.settingViaAttribute = false;
+		if(!settingViaAttribute && !reflectFromProperty) return;
+		if(!settingViaAttribute && transformFromProperty){
+			newValue = transformFromProperty.apply(element,[newValue]);
+		}
 		let inPropStore = propertyStore.hasOwnProperty(name);
-		let oldValue = element[name];
+		let oldValue = this.get();
 		if(oldValue===newValue && inPropStore) return;
 		propertyStore[name] = newValue;
-		if(reflectToAttribute) this.reflectValueToAttribute(newValue);
+		if(!settingViaAttribute && reflectToAttribute) this.reflectValueToAttribute(newValue);
 		this.emitChange(oldValue,newValue);
 	}
 	
@@ -316,7 +368,7 @@ class elementProperty {
 		if(this.ignoreEmitChange) return;
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || config.notify){
-			let detailObj = new propertyChangeDetails(element,name,config,newValue,oldValue);
+			let detailObj = new propertyChangeDetails({ element,name,config,newValue,oldValue });
 			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
 			if(hasObserver && isObserverString) element[config.observer].apply(element,[detailObj]);
 			else if(hasObserver) config.observer.apply(element,[detailObj]);
@@ -327,14 +379,4 @@ class elementProperty {
 	
 }
 
-class propertyChangeDetails {
-	
-	constructor(element,name,config,newValue,oldValue){
-		this.element = element;
-		this.name = name;
-		this.config = config;
-		this.newValue = newValue;
-		this.oldValue = oldValue;
-	}
-	
-}
+class propertyChangeDetails { constructor(obj){ Object.assign(this,obj); } }

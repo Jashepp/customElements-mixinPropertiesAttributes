@@ -29,20 +29,18 @@ npm install ce-mixinprops --save
 
 Or use via `import` with a CDN
 ```js
-import { mixinPropertiesAttributes } from 'https://unpkg.com/ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops
+import { mixinPropertiesAttributes, propTypes } from 'https://unpkg.com/ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops
 ```
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
 
 ## Examples
 
-Javascript Module:
-
-Simple display toggle.
+Simple display toggle (Javascript Module).
 
 ```js
-// Before running this example, install and specify the correct import paths
-import { mixinPropertiesAttributes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
+// Before running this example, install or specify the correct import paths
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
 
 // Define a class with the mixin on HTMLElement (or a class that extends it)
 export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
@@ -51,7 +49,7 @@ export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 	static get properties() {
 		return {
 			show: {
-				type: Boolean,
+				type: Boolean, // or propTypes.Boolean
 				value: true
 			},
 			hide: {
@@ -130,9 +128,9 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 }
 ```
 
-The first paramater of `mixinPropertiesAttributes` is the `base` class that you want to extend.
+The first paramater of `mixinPropertiesAttributes` is the `base` class that you want to extend. If no argument is provided, it will default to extending `HTMLElement`.
 
-The second paramater is an optional string which lets you specify the name of the `properties` static get method which is required for property & attribute configuration. This is configurable so you can have this mixin alongside other libraries.
+The second paramater is an optional string which lets you specify the name of the `properties` static get method which is used for property & attribute configuration. This is configurable so you can have this mixin alongside other libraries.
 
 ### Property/Attribute Configuration
 
@@ -144,7 +142,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	static get properties() {
 		return {
 			propName: {
-				type: String,
+				type: String, // or propTypes.String for different behaviour
 				value: 'World',
 				reflectToAttribute: true,
 				reflectFromAttribute: true

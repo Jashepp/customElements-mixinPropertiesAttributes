@@ -1,5 +1,5 @@
 
-import { mixinPropertiesAttributes } from '../../../index.js';
+import { mixinPropertiesAttributes, propTypes } from '../../../index.js';
 
 export const cElement = class testElementTypes extends mixinPropertiesAttributes(HTMLElement) {
 	
@@ -8,15 +8,15 @@ export const cElement = class testElementTypes extends mixinPropertiesAttributes
 	static get properties() {
 		return {
 			str: {
-				type: String,
+				type: propTypes.StringLegacy,
 				value: 'Default String Value',
 			},
 			num: {
-				type: Number,
+				type: propTypes.NumberLegacy,
 				value: 42,
 			},
 			bool: {
-				type: Boolean,
+				type: propTypes.Boolean,
 				value: true,
 			},
 			custom: {
@@ -24,13 +24,27 @@ export const cElement = class testElementTypes extends mixinPropertiesAttributes
 				value: 'Custom',
 			},
 			strEmpty: {
-				type: String,
+				type: propTypes.StringLegacy,
 			},
 			numEmpty: {
-				type: Number,
+				type: propTypes.NumberLegacy,
 			},
 			boolEmpty: {
-				type: Boolean,
+				type: propTypes.Boolean,
+			},
+			str2: {
+				type: propTypes.String,
+				value: 'Default String Value',
+			},
+			num2: {
+				type: propTypes.Number,
+				value: 42,
+			},
+			str2Empty: {
+				type: propTypes.String,
+			},
+			num2Empty: {
+				type: propTypes.Number,
 			},
 		};
 	}

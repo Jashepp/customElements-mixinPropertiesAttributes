@@ -119,28 +119,6 @@ describe("Property Options",()=>{
 			.should('have.attr','reflect2','ChangedViaAttrib');
 	});
 
-	it("reflectFromAttribute: callback - with type - catch error",()=>{
-		ignoreUncaughtErrors = true;
-		cy.visit('/options-basic/2-reflectFrom.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'reflectFrom' on testElementOptions. reflectFromAttribute callback does not work with the specified type.`);
-				expect(e).to.not.have.property('reflectFrom');
-			})
-			.should('not.have.attr','reflectFrom','');
-	});
-
-	it("reflectToAttribute: callback - with type - catch error",()=>{
-		ignoreUncaughtErrors = true;
-		cy.visit('/options-basic/2-reflectTo.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(lastUncaughtError+'','Check lastUncaughtError').to.contain(`Unable to setup property/attribute 'reflectTo' on testElementOptions. reflectToAttribute callback does not work with the specified type.`);
-				expect(e).to.not.have.property('reflectTo');
-			})
-			.should('not.have.attr','reflectTo','');
-	});
-
 	it("reflectToAttributeInConstructor: true",()=>{
 		cy.visit('/options-basic/index.html');
 		cy.get('#testElement')
