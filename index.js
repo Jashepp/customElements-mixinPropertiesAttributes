@@ -261,8 +261,8 @@ export const propTypes = {
 	},
 	String: {
 		toAttribute: (v)=>{ return v===null || v==='' ? null : ''+v; },
-		fromAttribute: (v)=>{ return v==null || v==='' ? null : ''+v; },
-		fromProperty: (v)=>{ return v===null || v==='' || v===void 0 ? '' : ''+v; },
+		fromAttribute: (v)=>{ return v==null ? null : ''+v; },
+		fromProperty: (v)=>{ return v===null || v===void 0 ? null : ''+v; },
 	},
 	StringLegacy: {
 		toAttribute: (v)=>{ return v===null ? '' : ''+v; },
@@ -271,8 +271,8 @@ export const propTypes = {
 	},
 	Number: {
 		toAttribute: (v)=>{ return v===null ? null : ''+v; },
-		fromAttribute: (v)=>{ v = Number(v); return Number.isNaN(v) ? null : v; },
-		fromProperty: (v)=>{ v = Number(v); return Number.isNaN(v) ? null : v; },
+		fromAttribute: (v)=>{ let n = Number(v); return v===null ? null : (Number.isNaN(n) ? null : n); },
+		fromProperty: (v)=>{ let n = Number(v); return v===null ? null : (Number.isNaN(n) ? null : n); },
 	},
 	NumberLegacy: {
 		toAttribute: (v)=>{ return Number(v) },

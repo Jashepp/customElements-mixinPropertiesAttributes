@@ -17,162 +17,184 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.strEmpty, 'strEmpty').to.eq('');
+				expect(e,'instant-check property').to.have.property('strEmpty','');
 			});
 	});
 	
 	it("propTypes.StringLegacy - No Value - Attribute=''",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'strEmpty', '');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('strEmpty','');
+			});
 	});
 	
-	it("propTypes.String - No Value - Property=''",()=>{
+	it("propTypes.String - No Value - Property=null",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.str2Empty, 'str2Empty').to.eq('');
+				expect(e,'instant-check property').to.have.property('str2Empty',null);
 			});
 	});
 	
 	it("propTypes.String - No Value - No Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('not.have.attr', 'str2Empty');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.not.have.attr('str2Empty');
+			});
 	});
 	
 	it("propTypes.NumberLegacy - No Value - Property=0",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.numEmpty, 'numEmpty').to.eq(0);
+				expect(e,'instant-check property').to.have.property('numEmpty',0);
 			});
 	});
 	
 	it("propTypes.NumberLegacy - No Value - Attribute=0",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'numEmpty', '0');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('numEmpty','0');
+			});
 	});
 	
 	it("propTypes.Number - No Value - Property=null",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.num2Empty, 'num2Empty').to.eq(null);
+				expect(e,'instant-check property').to.have.property('num2Empty',null);
 			});
 	});
 	
 	it("propTypes.Number - No Value - No Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('not.have.attr', 'num2Empty');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.not.have.attr('num2Empty');
+			});
 	});
 	
 	it("propTypes.Boolean - No Value - Property=false",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.boolEmpty, 'boolEmpty').to.eq(false);
+				expect(e,'instant-check property').to.have.property('boolEmpty',false);
 			});
 	});
 	
 	it("propTypes.Boolean - No Value - No Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('not.have.attr', 'boolEmpty');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.not.have.attr('boolEmpty');
+			});
 	});
 	
 	it("propTypes.StringLegacy - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.str, 'str').to.eq('Default String Value');
+				expect(e,'instant-check property').to.have.property('str','Default String Value');
 			});
 	});
 	
 	it("propTypes.StringLegacy - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'str', 'Default String Value');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('str','Default String Value');
+			});
 	});
 	
 	it("propTypes.String - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.str2, 'str2').to.eq('Default String Value');
+				expect(e,'instant-check property').to.have.property('str2','Default String Value');
 			});
 	});
 	
 	it("propTypes.String - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'str2', 'Default String Value');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('str2','Default String Value');
+			});
 	});
 
 	it("propTypes.NumberLegacy - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.num, 'num').to.eq(42);
+				expect(e,'instant-check property').to.have.property('num',42);
 			});
 	});
 	
 	it("propTypes.NumberLegacy - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'num', '42');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+			});
 	});
 	
 	it("propTypes.Number - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.num2, 'num2').to.eq(42);
+				expect(e,'instant-check property').to.have.property('num2',42);
 			});
 	});
 	
 	it("propTypes.Number - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'num2', '42');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('num2','42');
+			});
 	});
 	
 	it("propTypes.Boolean - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.bool, 'bool').to.eq(true);
+				expect(e,'instant-check property').to.have.property('bool',true);
 			});
 	});
 	
 	it("propTypes.Boolean - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('have.attr', 'bool', '');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+			});
 	});
 	
 	it("Combined Default Content",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.innerText, 'Content').to.eq('Str Default String Value, Num 42, Bool: true');
-			})
+				expect(e,'instant-check innerText Content').to.have.property('innerText','Str Default String Value, Num 42, Bool: true');
+			});
 	});
 	
 	it("No-Type - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e.custom, 'custom').to.eq('Custom');
+				expect(e,'instant-check property').to.have.property('custom','Custom');
 			});
 	});
 	
 	it("No-Type - Default Attribute (No Attribute)",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
-			.should('not.have.attr', 'custom', '');
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.not.have.attr('custom');
+			});
 	});
 });
 
