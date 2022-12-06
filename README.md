@@ -22,7 +22,7 @@ This was designed to help your [web components](https://web.dev/custom-elements-
 
 Note: This project is written with new ECMAScript features such as ESM, arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs).
 
-Install via [NPM][npm-url]
+Install via [NPM][npm-url], or github NPM package at [@jashepp/ce-mixinprops](https://github.com/Jashepp/customElements-mixinPropertiesAttributes/pkgs/npm/ce-mixinprops)
 ```
 npm install ce-mixinprops --save
 ```
@@ -206,7 +206,7 @@ Upon construction (initialisation/upgrade of the element), if an attribute **exi
 
 The same applies if a property **exists** on the element upon construction. Where `reflectFromProperty` is used instead, and a property is set instead of an attribute.
 
-If both an attribute and property exist on the element upon construction, see [Upgrading web component](#upgrading-web-component).
+If both an attribute and property exist on the element upon construction, see [Upgrading Web Component](#upgrading-web-component).
 
 `reflectFromProperty` will transform the `value` option before it's set as the property's default value. If `reflectFromProperty` is `false`, no default value will be set from the `value` option.
 
@@ -244,7 +244,7 @@ It is recommended to use a `set` descriptor to listen for changes. See '[Watchin
 | `newValue` | The new value. |
 | `oldValue` | The old value. |
 
-#### Data Transformation:
+#### Data Transformation
 
 This mixin allows transform functions to determine what values get transformed to, when setting via an attribute, via a property, or when converting from property to attribute.
 
@@ -398,7 +398,7 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 }
 ```
 
-### Upgrading web component
+### Upgrading Web Component
 
 Web components / custom elements are designed to be lazy loaded. So attributes and/or properties can exist or be set before the web component is defined/upgraded (`customElements.define`), and can also be set after it has been defined.
 
