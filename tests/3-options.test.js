@@ -146,6 +146,36 @@ describe("Property Options",()=>{
 			.should('have.attr','reflect4','Changed');
 	});
 
+	it("reflectFromProperty: true",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('reflectfromprop','42');
+				expect(e,'instant-check attribute').to.have.attr('reflectfromprop','42');
+				e.reflectfromprop = 43;
+				expect(e,'instant-check property').to.have.property('reflectfromprop','43');
+				expect(e,'instant-check attribute').to.have.attr('reflectfromprop','43');
+				e.setAttribute('reflectfromprop','44');
+				expect(e,'instant-check property').to.have.property('reflectfromprop','44');
+				expect(e,'instant-check attribute').to.have.attr('reflectfromprop','44');
+			});
+	});
+
+	it("reflectFromProperty: false",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('reflectnofromprop',42);
+				expect(e,'instant-check attribute').to.have.attr('reflectnofromprop','42');
+				e.reflectnofromprop = 43;
+				expect(e,'instant-check property').to.have.property('reflectnofromprop',42);
+				expect(e,'instant-check attribute').to.have.attr('reflectnofromprop','42');
+				e.setAttribute('reflectnofromprop','44');
+				expect(e,'instant-check property').to.have.property('reflectnofromprop','44');
+				expect(e,'instant-check attribute').to.have.attr('reflectnofromprop','44');
+			});
+	});
+
 	it("Watch for changes via set",()=>{
 		cy.visit('/options-basic/index.html');
 		cy.get('#testElement')

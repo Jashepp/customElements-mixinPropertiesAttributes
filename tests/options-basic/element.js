@@ -48,6 +48,16 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 				reflectFromAttribute: true,
 				reflectToAttributeInConstructor: false
 			},
+			reflectfromprop: {
+				type: String,
+				value: 42,
+				reflectFromProperty: true
+			},
+			reflectnofromprop: {
+				type: String,
+				value: 42,
+				reflectFromProperty: false
+			},
 			reflectfnchangeval: {
 				value: 'reflectfnchangeval',
 				reflectFromAttribute: function(val){
