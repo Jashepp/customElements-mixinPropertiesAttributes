@@ -275,9 +275,9 @@ export const propTypes = {
 		fromProperty: (v)=>{ let n = Number(v); return v===null ? null : (Number.isNaN(n) ? null : n); },
 	},
 	NumberLegacy: {
-		toAttribute: (v)=>{ return Number(v) },
-		fromAttribute: (v)=>{ return Number(v) },
-		fromProperty: (v)=>{ return v===void 0 ? 0 : Number(v) },
+		toAttribute: (v)=>{ return Number(v); },
+		fromAttribute: (v)=>{ return Number(v); },
+		fromProperty: (v)=>{ return v===void 0 ? 0 : Number(v); },
 	},
 };
 Object.freeze(propTypes);

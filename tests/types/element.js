@@ -7,13 +7,22 @@ export const cElement = class testElementTypes extends mixinPropertiesAttributes
 	
 	static get properties() {
 		return {
+			boolEmpty: {
+				type: propTypes.Boolean,
+			},
 			str: {
-				type: propTypes.StringLegacy,
+				type: propTypes.String,
 				value: 'Default String Value',
 			},
 			num: {
-				type: propTypes.NumberLegacy,
+				type: propTypes.Number,
 				value: 42,
+			},
+			strEmpty: {
+				type: propTypes.String,
+			},
+			numEmpty: {
+				type: propTypes.Number,
 			},
 			bool: {
 				type: propTypes.Boolean,
@@ -23,28 +32,19 @@ export const cElement = class testElementTypes extends mixinPropertiesAttributes
 				type: void 0,
 				value: 'Custom',
 			},
-			strEmpty: {
+			legacyStr: {
 				type: propTypes.StringLegacy,
-			},
-			numEmpty: {
-				type: propTypes.NumberLegacy,
-			},
-			boolEmpty: {
-				type: propTypes.Boolean,
-			},
-			str2: {
-				type: propTypes.String,
 				value: 'Default String Value',
 			},
-			num2: {
-				type: propTypes.Number,
+			legacyNum: {
+				type: propTypes.NumberLegacy,
 				value: 42,
 			},
-			str2Empty: {
-				type: propTypes.String,
+			legacyStrEmpty: {
+				type: propTypes.StringLegacy,
 			},
-			num2Empty: {
-				type: propTypes.Number,
+			legacyNumEmpty: {
+				type: propTypes.NumberLegacy,
 			},
 		};
 	}

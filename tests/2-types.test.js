@@ -13,27 +13,11 @@ describe("Data Type Defaults",()=>{
 		lastUncaughtError = null;
 	});
 
-	it("propTypes.StringLegacy - No Value - Property=''",()=>{
-		cy.visit('/types/index.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('strEmpty','');
-			});
-	});
-	
-	it("propTypes.StringLegacy - No Value - Attribute=''",()=>{
-		cy.visit('/types/index.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(e,'instant-check attribute').to.have.attr('strEmpty','');
-			});
-	});
-	
 	it("propTypes.String - No Value - Property=null",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('str2Empty',null);
+				expect(e,'instant-check property').to.have.property('strEmpty',null);
 			});
 	});
 	
@@ -41,23 +25,23 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check attribute').to.not.have.attr('str2Empty');
+				expect(e,'instant-check attribute').to.not.have.attr('strEmpty');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - No Value - Property=0",()=>{
+	it("propTypes.StringLegacy - No Value - Property=''",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('numEmpty',0);
+				expect(e,'instant-check property').to.have.property('legacyStrEmpty','');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - No Value - Attribute=0",()=>{
+	it("propTypes.StringLegacy - No Value - Attribute=''",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check attribute').to.have.attr('numEmpty','0');
+				expect(e,'instant-check attribute').to.have.attr('legacyStrEmpty','');
 			});
 	});
 	
@@ -65,7 +49,7 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('num2Empty',null);
+				expect(e,'instant-check property').to.have.property('numEmpty',null);
 			});
 	});
 	
@@ -73,7 +57,23 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check attribute').to.not.have.attr('num2Empty');
+				expect(e,'instant-check attribute').to.not.have.attr('numEmpty');
+			});
+	});
+	
+	it("propTypes.NumberLegacy - No Value - Property=0",()=>{
+		cy.visit('/types/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('legacyNumEmpty',0);
+			});
+	});
+	
+	it("propTypes.NumberLegacy - No Value - Attribute=0",()=>{
+		cy.visit('/types/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('legacyNumEmpty','0');
 			});
 	});
 	
@@ -93,7 +93,7 @@ describe("Data Type Defaults",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Default Property",()=>{
+	it("propTypes.String - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -101,43 +101,27 @@ describe("Data Type Defaults",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Default Attribute",()=>{
+	it("propTypes.String - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
 				expect(e,'instant-check attribute').to.have.attr('str','Default String Value');
 			});
 	});
-	
-	it("propTypes.String - Default Property",()=>{
-		cy.visit('/types/index.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('str2','Default String Value');
-			});
-	});
-	
-	it("propTypes.String - Default Attribute",()=>{
-		cy.visit('/types/index.html');
-		cy.get('#testElement')
-			.then(([e])=>{
-				expect(e,'instant-check attribute').to.have.attr('str2','Default String Value');
-			});
-	});
 
-	it("propTypes.NumberLegacy - Default Property",()=>{
+	it("propTypes.StringLegacy - Default Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('num',42);
+				expect(e,'instant-check property').to.have.property('legacyStr','Default String Value');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Default Attribute",()=>{
+	it("propTypes.StringLegacy - Default Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check attribute').to.have.attr('num','42');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','Default String Value');
 			});
 	});
 	
@@ -145,7 +129,7 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check property').to.have.property('num2',42);
+				expect(e,'instant-check property').to.have.property('num',42);
 			});
 	});
 	
@@ -153,7 +137,23 @@ describe("Data Type Defaults",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				expect(e,'instant-check attribute').to.have.attr('num2','42');
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+			});
+	});
+	
+	it("propTypes.NumberLegacy - Default Property",()=>{
+		cy.visit('/types/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('legacyNum',42);
+			});
+	});
+	
+	it("propTypes.NumberLegacy - Default Attribute",()=>{
+		cy.visit('/types/index.html');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','42');
 			});
 	});
 	
@@ -204,7 +204,7 @@ describe("Data Type Assigns",()=>{
 		lastUncaughtError = null;
 	});
 	
-	it("propTypes.StringLegacy - Change - via Property",()=>{
+	it("propTypes.String - Change - via Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -214,7 +214,7 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Change - via Attribute",()=>{
+	it("propTypes.String - Change - via Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -224,27 +224,27 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.String - Change - via Property",()=>{
+	it("propTypes.StringLegacy - Change - via Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.str2 = 'New Value';
-				expect(e,'instant-check property').to.have.property('str2','New Value');
-				expect(e,'instant-check attribute').to.have.attr('str2','New Value');
+				e.legacyStr = 'New Value';
+				expect(e,'instant-check property').to.have.property('legacyStr','New Value');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','New Value');
 			});
 	});
 	
-	it("propTypes.String - Change - via Attribute",()=>{
+	it("propTypes.StringLegacy - Change - via Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.setAttribute('str2', 'New Value');
-				expect(e,'instant-check property').to.have.property('str2','New Value');
-				expect(e,'instant-check attribute').to.have.attr('str2','New Value');
+				e.setAttribute('legacyStr', 'New Value');
+				expect(e,'instant-check property').to.have.property('legacyStr','New Value');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','New Value');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Change - via Property",()=>{
+	it("propTypes.Number - Change - via Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -254,7 +254,7 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Change - via Attribute",()=>{
+	it("propTypes.Number - Change - via Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -264,23 +264,23 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.Number - Change - via Property",()=>{
+	it("propTypes.NumberLegacy - Change - via Property",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = 42;
-				expect(e,'instant-check property').to.have.property('num2',42);
-				expect(e,'instant-check attribute').to.have.attr('num2','42');
+				e.legacyNum = 42;
+				expect(e,'instant-check property').to.have.property('legacyNum',42);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','42');
 			});
 	});
 	
-	it("propTypes.Number - Change - via Attribute",()=>{
+	it("propTypes.NumberLegacy - Change - via Attribute",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.setAttribute('num2', '42');
-				expect(e,'instant-check property').to.have.property('num2',42);
-				expect(e,'instant-check attribute').to.have.attr('num2','42');
+				e.setAttribute('legacyNum', '42');
+				expect(e,'instant-check property').to.have.property('legacyNum',42);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','42');
 			});
 	});
 	
@@ -362,7 +362,7 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Set As Object",()=>{
+	it("propTypes.String - Set As Object",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -372,7 +372,7 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Set Property As Number",()=>{
+	it("propTypes.String - Set Property As Number",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -382,7 +382,7 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.StringLegacy - Set Property As Boolean",()=>{
+	it("propTypes.String - Set Property As Boolean",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -398,53 +398,53 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.String - Set As Object",()=>{
+	it("propTypes.StringLegacy - Set As Object",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.str2 = {};
-				expect(e,'instant-check property').to.have.property('str2',''+{});
-				expect(e,'instant-check attribute').to.have.attr('str2',''+{});
+				e.legacyStr = {};
+				expect(e,'instant-check property').to.have.property('legacyStr',''+{});
+				expect(e,'instant-check attribute').to.have.attr('legacyStr',''+{});
 			});
 	});
 	
-	it("propTypes.String - Set Property As Number",()=>{
+	it("propTypes.StringLegacy - Set Property As Number",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.str2 = 42;
-				expect(e,'instant-check property').to.have.property('str2','42');
-				expect(e,'instant-check attribute').to.have.attr('str2','42');
+				e.legacyStr = 42;
+				expect(e,'instant-check property').to.have.property('legacyStr','42');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','42');
 			});
 	});
 	
-	it("propTypes.String - Set Property As Boolean",()=>{
+	it("propTypes.StringLegacy - Set Property As Boolean",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.str2 = false;
-				expect(e,'instant-check property').to.have.property('str2','false');
-				expect(e,'instant-check attribute').to.have.attr('str2','false');
+				e.legacyStr = false;
+				expect(e,'instant-check property').to.have.property('legacyStr','false');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','false');
 			});
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.str2 = true;
-				expect(e,'instant-check property').to.have.property('str2','true');
-				expect(e,'instant-check attribute').to.have.attr('str2','true');
+				e.legacyStr = true;
+				expect(e,'instant-check property').to.have.property('legacyStr','true');
+				expect(e,'instant-check attribute').to.have.attr('legacyStr','true');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Set Property As String 'abc'",()=>{
+	it("propTypes.Number - Set Property As String 'abc'",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
 				e.num = 'abc';
-				expect(e.num,'instant-check property').to.satisfy(Cypress._.isNaN);
-				expect(e,'instant-check attribute').to.have.attr('num','NaN');
+				expect(e,'instant-check property').to.have.property('num',null);
+				expect(e,'instant-check attribute').to.not.have.attr('num');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Set Property As String '42'",()=>{
+	it("propTypes.Number - Set Property As String '42'",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -454,17 +454,17 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Set Property As Object",()=>{
+	it("propTypes.Number - Set Property As Object",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
 				e.num = {};
-				expect(e.num,'instant-check property').to.satisfy(Cypress._.isNaN);
-				expect(e,'instant-check attribute').to.have.attr('num','NaN');
+				expect(e,'instant-check property').to.have.property('num',null);
+				expect(e,'instant-check attribute').to.not.have.attr('num');
 			});
 	});
 	
-	it("propTypes.NumberLegacy - Set Property As Boolean",()=>{
+	it("propTypes.Number - Set Property As Boolean",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
@@ -480,49 +480,49 @@ describe("Data Type Assigns",()=>{
 			});
 	});
 	
-	it("propTypes.Number - Set Property As String 'abc'",()=>{
+	it("propTypes.NumberLegacy - Set Property As String 'abc'",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = 'abc';
-				expect(e,'instant-check property').to.have.property('num2',null);
-				expect(e,'instant-check attribute').to.not.have.attr('num2');
+				e.legacyNum = 'abc';
+				expect(e.legacyNum,'instant-check property').to.satisfy(Cypress._.isNaN);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','NaN');
 			});
 	});
 	
-	it("propTypes.Number - Set Property As String '42'",()=>{
+	it("propTypes.NumberLegacy - Set Property As String '42'",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = '42';
-				expect(e,'instant-check property').to.have.property('num2',42);
-				expect(e,'instant-check attribute').to.have.attr('num2','42');
+				e.legacyNum = '42';
+				expect(e,'instant-check property').to.have.property('legacyNum',42);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','42');
 			});
 	});
 	
-	it("propTypes.Number - Set Property As Object",()=>{
+	it("propTypes.NumberLegacy - Set Property As Object",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = {};
-				expect(e,'instant-check property').to.have.property('num2',null);
-				expect(e,'instant-check attribute').to.not.have.attr('num2');
+				e.legacyNum = {};
+				expect(e.legacyNum,'instant-check property').to.satisfy(Cypress._.isNaN);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','NaN');
 			});
 	});
 	
-	it("propTypes.Number - Set Property As Boolean",()=>{
+	it("propTypes.NumberLegacy - Set Property As Boolean",()=>{
 		cy.visit('/types/index.html');
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = true;
-				expect(e,'instant-check property').to.have.property('num2',1);
-				expect(e,'instant-check attribute').to.have.attr('num2','1');
+				e.legacyNum = true;
+				expect(e,'instant-check property').to.have.property('legacyNum',1);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','1');
 			});
 		cy.get('#testElement')
 			.then(([e])=>{
-				e.num2 = false;
-				expect(e,'instant-check property').to.have.property('num2',0);
-				expect(e,'instant-check attribute').to.have.attr('num2','0');
+				e.legacyNum = false;
+				expect(e,'instant-check property').to.have.property('legacyNum',0);
+				expect(e,'instant-check attribute').to.have.attr('legacyNum','0');
 			});
 	});
 	
