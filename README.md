@@ -43,6 +43,7 @@ Simple display toggle (Javascript Module).
 import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
 
 // Define a class with the mixin on HTMLElement (or a class that extends it)
+// * If you don't want the mixin within the class declaration, see below for alternate usage
 export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
 	
 	// Define the behaviour/options of properties
@@ -99,12 +100,19 @@ Hello, Beautiful World!
 
 Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change. Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.
 
-Or with the following code, just click within the div to toggle the `show` property/attribute:
+Or see the [example file](./examples/1-simple-toggle.html) for an interactive version.
 
-```html
-<div onclick="document.querySelector('#exampleToggle').show = !document.querySelector('#exampleToggle').show">
-	Hello, <example-toggle id="exampleToggle">Beautiful</example-toggle> World!
-</div>
+If you don't want the mixin within the class declaration, it can also be applied afterwards instead:
+```js
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
+
+// Define a class without the mixin (which still extends HTMLElement)
+class exampleToggle extends HTMLElement {
+	// ...
+}
+
+// Define a custom element with the mixin applied after class declaration
+customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
 ```
 
 ### More Examples
@@ -113,6 +121,7 @@ More examples are located within `./examples/` on the git [repository on GitHub]
 
 - [Example 1 - Simple Toggle](./examples/1-simple-toggle.html)
 - [Example 2 - Using lit-html as the renderer](./examples/2-lit-html.html)
+- [Example 3 - Calling `mixinPropertiesAttributes` on an already declared class](./examples/3-after-declared.html)
 
 ## How To Use / API
 

@@ -56,4 +56,20 @@ describe("Examples",()=>{
 			})
 	});
 
+	it("3-after-declared",()=>{
+		cy.visit('../examples/3-after-declared.html');
+		cy.get('example-toggle').parent()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
+			})
+			.click()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, World!');
+			})
+			.click()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
+			});
+	});
+
 });
