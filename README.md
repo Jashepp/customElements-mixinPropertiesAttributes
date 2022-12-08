@@ -115,6 +115,8 @@ class exampleToggle extends HTMLElement {
 customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
 ```
 
+However, by using this method, you won't be able to change the [mixin's configuration](#mixin-configuration).
+
 ### More Examples
 
 More examples are located within `./examples/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include the examples directory.
