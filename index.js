@@ -60,8 +60,10 @@ export class mixinClass {
 			let config = propsConfig[name];
 			if(config.readOnly) return false;
 			if('reflectFromAttribute' in config) return !!config.reflectFromAttribute;
-			if(config.type===String || config.type===Number || config.type===Boolean) return true;
-			if(config.type && 'fromAttribute' in config.type) return !!config.type.fromAttribute;
+			let type = config.type;
+			if(typeof type==='string' && type in propTypes) type = propTypes[type];
+			else if(type===String || type===Number || type===Boolean) return true;
+			if('fromAttribute' in Object(type)) return !!type.fromAttribute;
 			return false;
 		}).map(name=>{
 			let config = propsConfig[name];
@@ -137,9 +139,13 @@ export class mixinClass {
 			}
 			if(hasConfigDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
 			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
-			if(config.type===String) config.type = propTypes.StringLegacy;
-			if(config.type===Number) config.type = propTypes.NumberLegacy;
-			if(config.type===Boolean) config.type = propTypes.Boolean;
+			if(typeof config.type==='string'){
+				if(config.type in propTypes) config.type = propTypes[config.type];
+				else throw new Error("'"+config.type+"' is not a valid propType");
+			}
+			else if(config.type===String) config.type = propTypes.StringLegacy;
+			else if(config.type===Number) config.type = propTypes.NumberLegacy;
+			else if(config.type===Boolean) config.type = propTypes.Boolean;
 			let reflectToAttribute = false, reflectFromAttribute = false, reflectFromProperty = false;
 			let transformToAttribute = null, transformFromAttribute = null, transformFromProperty = null;
 			if(config.type){
