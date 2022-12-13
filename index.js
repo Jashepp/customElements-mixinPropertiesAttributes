@@ -363,10 +363,9 @@ class elementProperty {
 		}
 		let inPropStore = propertyStore.hasOwnProperty(name);
 		let oldValue = this.get();
-		if(oldValue===newValue && inPropStore) return;
-		propertyStore[name] = newValue;
+		if(!inPropStore || oldValue!==newValue) propertyStore[name] = newValue;
 		if(!settingViaAttribute && reflectToAttribute) this.reflectValueToAttribute(newValue);
-		this.emitChange(oldValue,newValue);
+		if(!inPropStore || oldValue!==newValue) this.emitChange(oldValue,newValue);
 	}
 	
 	emitChange(oldValue,newValue){
