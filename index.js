@@ -228,7 +228,7 @@ export class mixinClass {
 		});
 	}
 
-	static applyCEMixin(base,propertiesName='properties'){
+	static applyCEMixin(base,propertiesName='properties',mixinConfig={}){
 		return class mixinPropertiesAttributes extends (base||HTMLElement) {
 	
 			static get observedAttributes() {
@@ -241,6 +241,7 @@ export class mixinClass {
 			}
 			
 			constructor(argOptions={},...argRest) {
+				argOptions = Object.assign({},Object(mixinConfig),Object(argOptions));
 				super(...(Object(argOptions).superArguments||[]),...argRest);
 				mixinClass.ce_mixinConstructor.apply(this,[argOptions,propertiesName]);
 			}
