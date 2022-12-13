@@ -140,7 +140,6 @@ export class mixinClass {
 			if(config.type===String) config.type = propTypes.StringLegacy;
 			if(config.type===Number) config.type = propTypes.NumberLegacy;
 			if(config.type===Boolean) config.type = propTypes.Boolean;
-			if(typeof config.type==='function') config.type = config.type.apply(Object.create(config),[]);
 			let reflectToAttribute = false, reflectFromAttribute = false, reflectFromProperty = false;
 			let transformToAttribute = null, transformFromAttribute = null, transformFromProperty = null;
 			if(config.type){
