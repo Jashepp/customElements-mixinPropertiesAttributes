@@ -115,7 +115,7 @@ class exampleToggle extends HTMLElement {
 customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
 ```
 
-However, by using this method, you won't be able to change the [mixin's configuration](#mixin-configuration).
+However, by using this method, to pass in a [mixin's configuration](#mixin-configuration), provide it as the 3rd argument to `mixinPropertiesAttributes`.
 
 ### More Examples
 
@@ -174,7 +174,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 
 | Property Config Option | Description (when `true` or specified) | Default Value |
 |-|-|-|
-| `type` | The type of property/attribute. Either use `String`, `Number`, `Boolean` (the actual object/keyword) or any type on `propTypes`. See [Property Types](#property-types). | `undefined` |
+| `type` | The type of property/attribute. Either use `String`, `Number`, `Boolean` (the actual object/keyword), any type on `propTypes`, or a string with a propType name. See [Property Types](#property-types). | `undefined` |
 | `attribute` | Overwrite attribute name to differ from property name. See [Alternate Attribute Name](#alternate-attribute-name) | Property Name |
 | `value` | The default value of the property/attribute. See [Default Value](#default-value). | `undefined` |
 | `reflectToAttribute` | `true`: Sync changes on the property to the attribute. See [Data Reflection](#data-reflection). | Automatic |
@@ -204,6 +204,8 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 `propTypes.Number`: Can be either `null` or `number`. If the property is set to `null`, or if the attribute doesn't exist, it will be set as `null`. If the property is set as anything else, or if the attribute exists, it will be transformed via `Number(value)` to be either a number, or `null` (if it resulted in `NaN`).
 
 Use the types specified on `propTypes` for future compatibility. The next major release *might* change `String` and `Number` objects/keywords to use the newer `propTypes.String` and `propTypes.Number` types.
+
+`type` can be specified as a string with the name of the propType if you don't have access to `propTypes` at the time of class declaration.
 
 You may also use your own type, if it has these 3 functions: `toAttribute`, `fromAttribute`, `fromProperty`. These are essentially the same as `reflectToAttribute`, `reflectFromAttribute`, and `reflectFromProperty`, respectively. See [Data Reflection](#data-reflection).
 
