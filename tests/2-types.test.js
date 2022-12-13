@@ -595,3 +595,242 @@ describe("Data Type Assigns",()=>{
 	});
 	
 });
+
+describe("Data Type Usage",()=>{
+	beforeEach(()=>{
+		ignoreUncaughtErrors = false;
+		lastUncaughtError = null;
+	});
+	
+	it("type as classic object/keyword - String",()=>{
+		cy.visit('/types/usage-classic/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('str','Default');
+				expect(e,'instant-check attribute').to.have.attr('str','Default');
+				e.setAttribute('str', 'New Value');
+				expect(e,'instant-check property').to.have.property('str','New Value');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value');
+				e.str = 'New Value 2';
+				expect(e,'instant-check property').to.have.property('str','New Value 2');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value 2');
+			});
+	});
+	
+	it("type as classic object/keyword - Number",()=>{
+		cy.visit('/types/usage-classic/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('num',42);
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+				e.setAttribute('num', 43);
+				expect(e,'instant-check property').to.have.property('num',43);
+				expect(e,'instant-check attribute').to.have.attr('num','43');
+				e.num = 44;
+				expect(e,'instant-check property').to.have.property('num',44);
+				expect(e,'instant-check attribute').to.have.attr('num','44');
+			});
+	});
+	
+	it("type as classic object/keyword - Boolean",()=>{
+		cy.visit('/types/usage-classic/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.setAttribute('bool','');
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.removeAttribute('bool');
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.bool = true;
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.bool = false;
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+			});
+	});
+	
+	it("type as propType.type - String",()=>{
+		cy.visit('/types/usage-propType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('str','Default');
+				expect(e,'instant-check attribute').to.have.attr('str','Default');
+				e.setAttribute('str', 'New Value');
+				expect(e,'instant-check property').to.have.property('str','New Value');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value');
+				e.str = 'New Value 2';
+				expect(e,'instant-check property').to.have.property('str','New Value 2');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value 2');
+			});
+	});
+	
+	it("type as propType.type - Number",()=>{
+		cy.visit('/types/usage-propType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('num',42);
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+				e.setAttribute('num', 43);
+				expect(e,'instant-check property').to.have.property('num',43);
+				expect(e,'instant-check attribute').to.have.attr('num','43');
+				e.num = 44;
+				expect(e,'instant-check property').to.have.property('num',44);
+				expect(e,'instant-check attribute').to.have.attr('num','44');
+			});
+	});
+	
+	it("type as propType.type - Boolean",()=>{
+		cy.visit('/types/usage-propType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.setAttribute('bool','');
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.removeAttribute('bool');
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.bool = true;
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.bool = false;
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+			});
+	});
+	
+	it("type as string - String",()=>{
+		cy.visit('/types/usage-propType-string/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('str','Default');
+				expect(e,'instant-check attribute').to.have.attr('str','Default');
+				e.setAttribute('str', 'New Value');
+				expect(e,'instant-check property').to.have.property('str','New Value');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value');
+				e.str = 'New Value 2';
+				expect(e,'instant-check property').to.have.property('str','New Value 2');
+				expect(e,'instant-check attribute').to.have.attr('str','New Value 2');
+			});
+	});
+	
+	it("type as string - Number",()=>{
+		cy.visit('/types/usage-propType-string/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('num',42);
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+				e.setAttribute('num', 43);
+				expect(e,'instant-check property').to.have.property('num',43);
+				expect(e,'instant-check attribute').to.have.attr('num','43');
+				e.num = 44;
+				expect(e,'instant-check property').to.have.property('num',44);
+				expect(e,'instant-check attribute').to.have.attr('num','44');
+			});
+	});
+	
+	it("type as string - Boolean",()=>{
+		cy.visit('/types/usage-propType-string/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.setAttribute('bool','');
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.removeAttribute('bool');
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.bool = true;
+				expect(e,'instant-check property').to.have.property('bool',true);
+				expect(e,'instant-check attribute').to.have.attr('bool','');
+				e.bool = false;
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+			});
+	});
+	
+	it("custom type - customTypes.typeUppercaseWords",()=>{
+		cy.visit('/types/usage-customType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('str','Default');
+				expect(e,'instant-check attribute').to.have.attr('str','Default');
+				e.setAttribute('str', 'foobar abc');
+				expect(e,'some words - property').to.have.property('str','Foobar Abc');
+				expect(e,'some words - attribute').to.have.attr('str','foobar abc');
+				e.str = 'barfoo a defg';
+				expect(e,'some words - property').to.have.property('str','Barfoo A Defg');
+				expect(e,'some words - attribute').to.have.attr('str','Barfoo A Defg');
+			});
+	});
+	
+	it("custom type - customTypes.typeNumberRange",()=>{
+		cy.visit('/types/usage-customType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('num',42);
+				expect(e,'instant-check attribute').to.have.attr('num','42');
+				e.setAttribute('num', 43);
+				expect(e,'instant-check property').to.have.property('num',43);
+				expect(e,'instant-check attribute').to.have.attr('num','43');
+				e.num = 44;
+				expect(e,'within-range property').to.have.property('num',44);
+				expect(e,'within-range attribute').to.have.attr('num','44');
+				e.setAttribute('num', 120);
+				expect(e,'over-max property').to.have.property('num',50);
+				expect(e,'over-max attribute').to.have.attr('num','120');
+				e.num = 140;
+				expect(e,'over-max property').to.have.property('num',50);
+				expect(e,'over-max attribute').to.have.attr('num','50');
+				e.setAttribute('num', 7);
+				expect(e,'under-min property').to.have.property('num',10);
+				expect(e,'under-min attribute').to.have.attr('num','7');
+				e.num = 8;
+				expect(e,'under-min property').to.have.property('num',10);
+				expect(e,'under-min attribute').to.have.attr('num','10');
+			});
+	});
+	
+	it("custom type - customTypes.typeBoolSwitch",()=>{
+		cy.visit('/types/usage-customType/');
+		cy.get('#testElement')
+			.then(([e])=>{
+				expect(e,'instant-check property').to.have.property('bool',false);
+				expect(e,'instant-check attribute').to.not.have.attr('bool');
+				e.setAttribute('bool','');
+				expect(e,'empty-attr property').to.have.property('bool',null);
+				expect(e,'empty-attr attribute').to.have.attr('bool','');
+				e.removeAttribute('bool');
+				expect(e,'no-attr property').to.have.property('bool',false);
+				expect(e,'no-attr attribute').to.not.have.attr('bool');
+				e.bool = true;
+				expect(e,'prop-true property').to.have.property('bool',true);
+				expect(e,'prop-true attribute').to.have.attr('bool','');
+				e.bool = false;
+				expect(e,'prop-false property').to.have.property('bool',false);
+				expect(e,'prop-false attribute').to.not.have.attr('bool');
+				e.setAttribute('bool','on');
+				expect(e,'empty-on property').to.have.property('bool',true);
+				expect(e,'empty-on attribute').to.have.attr('bool','on');
+				e.setAttribute('bool','off');
+				expect(e,'empty-off property').to.have.property('bool',false);
+				expect(e,'empty-off attribute').to.have.attr('bool','off');
+				e.bool = 'no';
+				expect(e,'prop-no property').to.have.property('bool',false);
+				expect(e,'prop-no attribute').to.not.have.attr('bool');
+				e.bool = 'yes';
+				expect(e,'prop-yes property').to.have.property('bool',true);
+				expect(e,'prop-yes attribute').to.have.attr('bool','');
+				e.bool = 'foobar';
+				expect(e,'prop-yes property').to.have.property('bool',null);
+				expect(e,'prop-yes attribute').to.not.have.attr('bool');
+			});
+	});
+	
+});
