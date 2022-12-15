@@ -18,15 +18,18 @@
     "cypress": "^11.2.0",
     "http-server": "^14.1.1",
     "nodemon": "^2.0.20",
-    "start-server-and-test": "^1.14.0"
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3"
   },
   "scripts": {
     "server": "npx --no --node-options=--no-deprecation http-server ./ -s -c-1 -p 8181",
-    "cypress": "npx --no cypress open",
-    "cypress+server": "npx --no start-server-and-test server http-get://localhost:8181 cypress",
-    "cypress:cli": "npx --no cypress run",
-    "test": "npx --no start-server-and-test server http-get://localhost:8181 cypress:cli",
-    "watch:test": "npx --no start-server-and-test server http-get://localhost:8181 watch:test:cypress",
+    "server:and": "cross-env CONCURRENTLY_KILL_OTHERS=true CONCURRENTLY_SUCCESS=!command-0 concurrently --names S,C \"npm run server\"",
+    "cypress:install": "cypress install",
+    "cypress": "cypress open",
+    "cypress+server": "npm run server:and -- \"npm run cypress\"",
+    "cypress:cli": "cypress run",
+    "test": "npm run server:and -- \"npm run cypress:cli\"",
+    "watch:test": "npm run server:and -- \"npm run watch:test:cypress\"",
     "watch:test:cypress": "npx --no --node-options=--input-type=module nodemon --watch ./*.js --watch ./tests/ --exec npm run cypress:cli"
   }
 }
