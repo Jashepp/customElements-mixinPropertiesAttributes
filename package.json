@@ -1,6 +1,6 @@
 {
   "name": "ce-mixinprops",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Mixin for Custom Elements (Web Components) to handle/sync properties and attributes",
   "main": "index.js",
   "exports": {
