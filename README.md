@@ -115,7 +115,7 @@ class exampleToggle extends HTMLElement {
 customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
 ```
 
-However, by using this method, to pass in a [mixin's configuration](#mixin-configuration), provide it as the 3rd argument to `mixinPropertiesAttributes`.
+However, to pass in a [mixin's configuration](#mixin-configuration) with this method, provide it as the 3rd argument to `mixinPropertiesAttributes`.
 
 ### More Examples
 
