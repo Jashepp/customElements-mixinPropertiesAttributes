@@ -342,14 +342,19 @@ class elementProperty {
 	reflectValueToAttribute(newValue){
 		let { element, attribute, reflectToAttribute, transformToAttribute } = this.props;
 		if(reflectToAttribute){
-			this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
+			let currentValue = element.getAttribute(attribute);
 			if(transformToAttribute){
 				let transformedValue = transformToAttribute.apply(element,[newValue]);
-				this.skipNextAttribChange[attribute] = transformedValue===null ? null : ''+transformedValue;
-				if(transformedValue===null) element.removeAttribute(attribute);
-				else element.setAttribute(attribute,transformedValue);
+				if(currentValue!==transformedValue){
+					this.skipNextAttribChange[attribute] = transformedValue===null ? null : ''+transformedValue;
+					if(transformedValue===null) element.removeAttribute(attribute);
+					else element.setAttribute(attribute,transformedValue);
+				}
 			}
-			else element.setAttribute(attribute,newValue);
+			else if(currentValue!==newValue){
+				this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
+				element.setAttribute(attribute,newValue);
+			}
 		}
 	}
 	
