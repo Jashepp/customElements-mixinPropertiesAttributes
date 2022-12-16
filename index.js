@@ -316,15 +316,14 @@ class elementProperty {
 	getValueFromAttribute(){
 		let { element, attribute, transformFromAttribute, config } = this.props;
 		if(config.readOnly) return;
-		let hasAttribute = element.hasAttribute(attribute);
 		if(transformFromAttribute){
 			if(this.transformingFromAttribute) return;
 			this.transformingFromAttribute = true;
-			let transformedValue = transformFromAttribute.apply(element,[hasAttribute ? element.getAttribute(attribute) : null]);
+			let transformedValue = transformFromAttribute.apply(element,[element.getAttribute(attribute)]);
 			this.transformingFromAttribute = false;
 			return transformedValue;
 		}
-		if(hasAttribute) return element.getAttribute(attribute);
+		if(element.hasAttribute(attribute)) return element.getAttribute(attribute);
 	}
 	
 	setValueViaAttribute(newValue){
