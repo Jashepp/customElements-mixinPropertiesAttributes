@@ -343,17 +343,11 @@ class elementProperty {
 		let { element, attribute, reflectToAttribute, transformToAttribute } = this.props;
 		if(reflectToAttribute){
 			let currentValue = element.getAttribute(attribute);
-			if(transformToAttribute){
-				let transformedValue = transformToAttribute.apply(element,[newValue]);
-				if(currentValue!==transformedValue){
-					this.skipNextAttribChange[attribute] = transformedValue===null ? null : ''+transformedValue;
-					if(transformedValue===null) element.removeAttribute(attribute);
-					else element.setAttribute(attribute,transformedValue);
-				}
-			}
-			else if(currentValue!==newValue){
+			if(transformToAttribute) newValue = transformToAttribute.apply(element,[newValue]);
+			if(currentValue!==newValue){
 				this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
-				element.setAttribute(attribute,newValue);
+				if(newValue===null) element.removeAttribute(attribute);
+				else element.setAttribute(attribute,newValue);
 			}
 		}
 	}
