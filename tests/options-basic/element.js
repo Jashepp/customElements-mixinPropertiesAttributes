@@ -169,6 +169,11 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 				value: 'notify1',
 				notify: true
 			},
+			notify2: {
+				type: String,
+				value: 'notify2',
+				notify: 'notify2-evnt'
+			},
 			watchViaSet: {
 				type: String,
 				value: 'watchViaSet'

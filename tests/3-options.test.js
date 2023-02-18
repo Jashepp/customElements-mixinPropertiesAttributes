@@ -645,6 +645,38 @@ describe("Property Options",()=>{
 			});
 	});
 
+	it("notify: as String",()=>{
+		cy.visit('/options-basic/index.html');
+		let changedViaEvent = false, lastEvent = null;
+		cy.get('#testElement')
+			.should('have.attr','notify2','notify2')
+			.then(([e])=>{
+				expect(e.notify2,'Init Prop Value').to.eq('notify2');
+				e.addEventListener('notify2-evnt', function onNotify2Change(event) {
+					changedViaEvent = true;
+					lastEvent = event;
+				});
+				expect(changedViaEvent,'changedViaEvent').to.eq(false);
+				e.notify2 = 'Changed1';
+				expect(e.notify2,'Changed Value').to.eq('Changed1');
+				expect(changedViaEvent,'changedViaEvent').to.eq(true);
+				changedViaEvent = false;
+				e.setAttribute('notify2','Changed2');
+				expect(e.notify2,'Changed Value').to.eq('Changed2');
+				expect(changedViaEvent).to.eq(true);
+			})
+			.should('have.attr','notify2','Changed2')
+			.then(([e])=>{
+				assert.isObject(lastEvent.detail,'event.detail is an object');
+				expect(lastEvent.detail).to.have.property('element', e);
+				expect(lastEvent.detail).to.have.property('name','notify2');
+				expect(lastEvent.detail).to.have.property('config');
+				assert.isObject(lastEvent.detail.config,'config is an object');
+				expect(lastEvent.detail).to.have.property('newValue','Changed2');
+				expect(lastEvent.detail).to.have.property('oldValue','Changed1');
+			});
+	});
+
 	it("Order option",()=>{
 		cy.visit('/options-basic/index.html');
 		cy.get('#testElement')

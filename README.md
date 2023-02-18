@@ -187,7 +187,7 @@ Properties **are** case sensitive, and attributes are **not** case sensitive (du
 | `readOnly` | Prevent the property from being modified. Attribute modifications will be ignored. See [Data Reflection](#data-reflection). | `false` |
 | `delayChangeInConstructor` | Delay [changes](#watching-for-changes) (set, observer, notify) in constructor. See [Configuring Value Changes](#configuring-value-changes). | `true` |
 | `observer` | A class method name (String) or an actual callback (Function) which is called upon change. See [Configuring Value Changes](#configuring-value-changes). | - |
-| `notify` | Emits a *propName*`-changed` event on the class. See [Configuring Value Changes](#configuring-value-changes). | `false` |
+| `notify` | Emits an event on change with specified name (or *propName*`-changed` if not a string but truey). See [Configuring Value Changes](#configuring-value-changes). | `false` |
 | `overrideExisting` | This mixin checks the class and the classes the base extends to make sure the property does not already exist. This will ignore that check. | `false` |
 | `order` | `number`: The sorting order in which the property gets setup on the class. | - |
 
@@ -243,7 +243,7 @@ The `delayChangeInConstructor` option, when `true`, delays all [changes](#watchi
 
 For the `observer` option, the [Property Change Details Object](#property-change-details-object) will be the first argument.
 
-All events emitted when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object).
+All events emitted when the `notify` option is specified, will have `event.detail` set to the [Property Change Details Object](#property-change-details-object). The event will not bubble up the DOM.
 
 It is recommended to use a `set` descriptor to listen for changes. See '[Watching For Changes](#watching-for-changes)' below.
 

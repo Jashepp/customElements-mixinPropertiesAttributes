@@ -144,6 +144,7 @@ export class mixinClass {
 			if(hasConfigDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
 			let hasObserver = 'observer' in config && (typeof config.observer==='function' || typeof config.observer==='string');
 			let isObserverString = hasObserver && typeof config.observer==='string';
+			let eventName = typeof config.notify==='string' ? config.notify : (config.notify ? name+'-changed' : null);
 			if(typeof config.type==='string'){
 				if(config.type in propTypes) config.type = propTypes[config.type];
 				else throw new Error("'"+config.type+"' is not a valid propType");
@@ -184,7 +185,7 @@ export class mixinClass {
 				if(descriptor && descriptor.set && setDescriptors.indexOf(descriptor.set)===-1) setDescriptors.unshift(descriptor.set);
 			}
 			let eProp = config[mixinClass.symbols.elementProperty] = new elementProperty({
-				propertyStore, element, name, attribute, config, reflectToAttribute, reflectFromAttribute, reflectFromProperty, transformToAttribute, transformFromAttribute, transformFromProperty, onPropertySet, hasObserver, isObserverString, setDescriptors
+				propertyStore, element, name, attribute, config, reflectToAttribute, reflectFromAttribute, reflectFromProperty, transformToAttribute, transformFromAttribute, transformFromProperty, onPropertySet, hasObserver, isObserverString, eventName, setDescriptors
 			});
 			if(transformFromProperty){
 				config.value = mixinClass.fn(transformFromProperty,element,['value' in config ? config.value : void 0]);
@@ -372,15 +373,15 @@ class elementProperty {
 	}
 	
 	emitChange(oldValue,newValue){
-		let { element, name, config, onPropertySet, hasObserver, isObserverString, setDescriptors } = this.props;
+		let { element, name, config, onPropertySet, hasObserver, isObserverString, eventName, setDescriptors } = this.props;
 		if(this.ignoreEmitChange) return;
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
-		if(onPropertySet || hasObserver || config.notify){
+		if(onPropertySet || hasObserver || eventName!==null){
 			let detailObj = new propertyChangeDetails({ element,name,config,newValue,oldValue });
 			if(onPropertySet) mixinClass.fn(onPropertySet,element,[detailObj]);
 			if(hasObserver && isObserverString) mixinClass.fn(element[config.observer],element,[detailObj]);
 			else if(hasObserver) mixinClass.fn(config.observer,element,[detailObj]);
-			if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj, bubbles:false }));
+			if(eventName!==null) element.dispatchEvent(new CustomEvent(eventName,{ detail:detailObj, bubbles:false }));
 		}
 		for(let i=0,l=setDescriptors.length; i<l; i++) setDescriptors[i].apply(element,[newValue]);
 	}
