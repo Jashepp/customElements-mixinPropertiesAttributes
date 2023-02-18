@@ -152,6 +152,18 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 					this.previousOnObserver2 = eventDetails;
 				}
 			},
+			observer3: {
+				type: String,
+				value: 'observer3',
+				observer: (eventDetails,element)=>{
+					element.previousOnObserver3 = eventDetails;
+				}
+			},
+			observer4: {
+				type: String,
+				value: 'observer4',
+				observer: 'fnDoesNotExist'
+			},
 			notify1: {
 				type: String,
 				value: 'notify1',
@@ -215,6 +227,7 @@ export const cElement = class testElementOptions extends mixinPropertiesAttribut
 		this.reflect4HasAtribOnConstruct = this.hasAttribute('reflect4');
 		this.previousOnObserver1 = null;
 		this.previousOnObserver2 = null;
+		this.previousOnObserver3 = null;
 		this.watchViaSetTriggered = null;
 		this.watchViaSet2Triggered = null;
 		this.delay1TriggeredInConstructor = ('delay1Triggered' in this);

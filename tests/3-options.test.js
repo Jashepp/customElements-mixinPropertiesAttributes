@@ -581,7 +581,39 @@ describe("Property Options",()=>{
 			});
 	});
 
-	it("notify1: true",()=>{
+	it("observer: as Shorthand Function Callback",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('have.attr','observer3','observer3')
+			.then(([e])=>{
+				expect(e.observer3,'Init Prop Value').to.eq('observer3');
+				expect(e.previousOnObserver3).to.eq(null);
+				e.previousOnObserver3 = null;
+				e.observer3 = 'Changed';
+				expect(e.observer3,'Changed Value').to.eq('Changed');
+				expect(e.previousOnObserver3).to.not.eq(null);
+				assert.isObject(e.previousOnObserver3,'Observer argument is an object');
+				expect(e.previousOnObserver3).to.have.property('element', e);
+				expect(e.previousOnObserver3).to.have.property('name','observer3');
+				expect(e.previousOnObserver3).to.have.property('config');
+				assert.isObject(e.previousOnObserver3.config,'config is an object');
+				expect(e.previousOnObserver3).to.have.property('newValue','Changed');
+				expect(e.previousOnObserver3).to.have.property('oldValue','observer3');
+			});
+	});
+
+	it("observer: as String - function does not exist - does not error",()=>{
+		cy.visit('/options-basic/index.html');
+		cy.get('#testElement')
+			.should('have.attr','observer4','observer4')
+			.then(([e])=>{
+				expect(e.observer4,'Init Prop Value').to.eq('observer4');
+				e.observer3 = 'Changed';
+				expect(e.observer3,'Changed Value').to.eq('Changed');
+			});
+	});
+
+	it("notify: true",()=>{
 		cy.visit('/options-basic/index.html');
 		let changedViaEvent = false, lastEvent = null;
 		cy.get('#testElement')

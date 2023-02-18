@@ -54,6 +54,10 @@ export class mixinClass {
 		return propsConfig;
 	};
 
+	static fn(fn,proto,args){
+		if(fn) return fn.prototype ? fn.apply(proto,args) : fn.call(proto,...args,proto);
+	}
+
 	static ce_observedAttributes(propertiesName){
 		let propsConfig = mixinClass.buildProtoPropsConfig(propertiesName,mixinClass.getProtoTree(this));
 		return Object.keys(propsConfig).filter(name=>{
@@ -138,7 +142,8 @@ export class mixinClass {
 				});
 			}
 			if(hasConfigDefaults) for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
-			let hasObserver = 'observer' in config, isObserverString = hasObserver && typeof config.observer==='string';
+			let hasObserver = 'observer' in config && (typeof config.observer==='function' || typeof config.observer==='string');
+			let isObserverString = hasObserver && typeof config.observer==='string';
 			if(typeof config.type==='string'){
 				if(config.type in propTypes) config.type = propTypes[config.type];
 				else throw new Error("'"+config.type+"' is not a valid propType");
@@ -182,13 +187,13 @@ export class mixinClass {
 				propertyStore, element, name, attribute, config, reflectToAttribute, reflectFromAttribute, reflectFromProperty, transformToAttribute, transformFromAttribute, transformFromProperty, onPropertySet, hasObserver, isObserverString, setDescriptors
 			});
 			if(transformFromProperty){
-				config.value = transformFromProperty.apply(element,['value' in config ? config.value : void 0]);
+				config.value = mixinClass.fn(transformFromProperty,element,['value' in config ? config.value : void 0]);
 			}
 			let defaultValue = config.value;
 			let existingDescriptor = Object.getOwnPropertyDescriptor(element,name);
 			let existingPropExists = existingDescriptor && existingDescriptor.enumerable;
 			let existingPropValue = existingPropExists ? (existingDescriptor.get ? existingDescriptor.get() : existingDescriptor.value) : void 0;
-			if(existingPropExists && transformFromProperty) existingPropValue = transformFromProperty.apply(element,[existingPropValue]);
+			if(existingPropExists && transformFromProperty) existingPropValue = mixinClass.fn(transformFromProperty,element,[existingPropValue]);
 			if(config.readOnly) Object.defineProperty(element,name,{
 				enumerable: eProp.enumerable,
 				configurable: eProp.configurable,
@@ -319,7 +324,7 @@ class elementProperty {
 		if(transformFromAttribute){
 			if(this.transformingFromAttribute) return;
 			this.transformingFromAttribute = true;
-			let transformedValue = transformFromAttribute.apply(element,[element.getAttribute(attribute)]);
+			let transformedValue = mixinClass.fn(transformFromAttribute,element,[element.getAttribute(attribute)]);
 			this.transformingFromAttribute = false;
 			return transformedValue;
 		}
@@ -331,7 +336,7 @@ class elementProperty {
 		if(config.readOnly) return;
 		if(transformFromAttribute){
 			this.transformingFromAttribute = true;
-			newValue = transformFromAttribute.apply(element,[newValue]);
+			newValue = mixinClass.fn(transformFromAttribute,element,[newValue]);
 			this.transformingFromAttribute = false;
 		}
 		this.settingViaAttribute = true;
@@ -342,7 +347,7 @@ class elementProperty {
 		let { element, attribute, reflectToAttribute, transformToAttribute } = this.props;
 		if(reflectToAttribute){
 			let currentValue = element.getAttribute(attribute);
-			if(transformToAttribute) newValue = transformToAttribute.apply(element,[newValue]);
+			if(transformToAttribute) newValue = mixinClass.fn(transformToAttribute,element,[newValue]);
 			if(currentValue!==newValue){
 				this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
 				if(newValue===null) element.removeAttribute(attribute);
@@ -357,7 +362,7 @@ class elementProperty {
 		this.settingViaAttribute = false;
 		if(!settingViaAttribute && !reflectFromProperty) return;
 		if(!settingViaAttribute && transformFromProperty){
-			newValue = transformFromProperty.apply(element,[newValue]);
+			newValue = mixinClass.fn(transformFromProperty,element,[newValue]);
 		}
 		let inPropStore = propertyStore.hasOwnProperty(name);
 		let oldValue = this.get();
@@ -372,9 +377,9 @@ class elementProperty {
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || config.notify){
 			let detailObj = new propertyChangeDetails({ element,name,config,newValue,oldValue });
-			if(onPropertySet) onPropertySet.apply(element,[detailObj]);
-			if(hasObserver && isObserverString) element[config.observer].apply(element,[detailObj]);
-			else if(hasObserver) config.observer.apply(element,[detailObj]);
+			if(onPropertySet) mixinClass.fn(onPropertySet,element,[detailObj]);
+			if(hasObserver && isObserverString) mixinClass.fn(element[config.observer],element,[detailObj]);
+			else if(hasObserver) mixinClass.fn(config.observer,element,[detailObj]);
 			if(config.notify) element.dispatchEvent(new CustomEvent(name+'-changed',{ detail:detailObj, bubbles:false }));
 		}
 		for(let i=0,l=setDescriptors.length; i<l; i++) setDescriptors[i].apply(element,[newValue]);
