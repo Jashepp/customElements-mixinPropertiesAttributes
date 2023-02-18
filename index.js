@@ -69,7 +69,7 @@ export class mixinClass {
 			if('fromAttribute' in Object(type)) return !!type.fromAttribute;
 			return false;
 		}).map(([name,config])=>{
-			return ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+			return ('attribute' in config ? config.attribute+'' : ''+name).toLowerCase();
 		});
 	}
 
@@ -93,7 +93,7 @@ export class mixinClass {
 		argOptions = Object(argOptions);
 		let protoTree = mixinClass.getConstructorTree(Object.getPrototypeOf(this));
 		let propsConfig = mixinClass.buildConstructorPropsConfig(propertiesName,protoTree);
-		let propsLower = Object.keys(propsConfig).map(prop=>prop.toLowerCase());
+		let propsLower = Object.keys(propsConfig).map(name=>(''+name).toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
@@ -112,12 +112,11 @@ export class mixinClass {
 	
 	static ce_mixinConstructorSetupProp({ name, config, protoTree, propsConfig, argOptions }){
 		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = argOptions;
-		let propsConfigByAttribute = this[mixinClass.symbols.propsConfigByAttribute];
 		if('attribute' in config && typeof config.attribute!='string') throw new Error(`Unable to setup property '${name}' on ${this.constructor.name}. Attribute is not a string.`);
-		let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+		let attribute = ('attribute' in config ? config.attribute+'' : ''+name).toLowerCase();
 		let combinedName = name==attribute || name.toLowerCase()==attribute ? name : name+'/'+attribute;
 		config.propertyName = name;
-		propsConfigByAttribute[attribute] = config;
+		this[mixinClass.symbols.propsConfigByAttribute][attribute] = config;
 		if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. '${name}' is a protected property.`);
 		if(protectedAttributes.indexOf(attribute)!==-1) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. '${attribute}' is a protected attribute.`);
 		if(config.overrideExisting!==true){
@@ -137,7 +136,7 @@ export class mixinClass {
 		if(name!==attribute && name.toLowerCase()!==attribute){
 			Object.entries(propsConfig).forEach(([name2,config2])=>{
 				if(name==name2) return;
-				let attribute2 = ('attribute' in config2 ? config2.attribute+'' : name2).toLowerCase();
+				let attribute2 = ('attribute' in config2 ? config2.attribute+'' : ''+name2).toLowerCase();
 				let combinedName2 = name2==attribute2 || name2.toLowerCase()==attribute2 ? name2 : name2+'/'+attribute2;
 				if(attribute==attribute2) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists as a different property/attribute '${combinedName2}'.`);
 			});
@@ -189,7 +188,7 @@ export class mixinClass {
 			propertyStore, element:this, name, attribute, config, reflectToAttribute, reflectFromAttribute, reflectFromProperty, transformToAttribute, transformFromAttribute, transformFromProperty, onPropertySet, hasObserver, isObserverString, eventName, setDescriptors
 		});
 		if(transformFromProperty){
-			config.value = mixinClass.fn(transformFromProperty,this,['value' in config ? config.value : void 0]);
+			config.value = mixinClass.fn(transformFromProperty,this,[config.value]);
 		}
 		let defaultValue = config.value;
 		let existingDescriptor = Object.getOwnPropertyDescriptor(this,name);
@@ -223,14 +222,14 @@ export class mixinClass {
 				if(nowValue!==defaultValue && !eProp.firstChangeEmitted) eProp.emitChange(defaultValue,nowValue);
 			});
 		}
-		if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.props.reflectToAttribute = false;
+		if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.config.reflectToAttribute = false;
 		if(existingPropExists && !attribExists && reflectFromProperty && defaultValue!==existingPropValue){
 			eProp.set(existingPropValue); // Set new value
 		}
 		if(!existingPropExists && attribExists && reflectFromAttribute && defaultValue!==attribValue){
 			eProp.setValueViaAttribute(attribValue); // Set new value
 		}
-		if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.props.reflectToAttribute = true;
+		if(!reflectToAttributeInConstructor && reflectToAttribute) eProp.config.reflectToAttribute = true;
 		Object.freeze(config);
 	}
 
@@ -265,7 +264,7 @@ Object.freeze(mixinClass);
  */
 export const mixinPropertiesAttributes = mixinClass.applyCEMixin;
 
-export const propTypes = {
+export const propTypes = Object.freeze({
 	Boolean: {
 		toAttribute: (v)=>{ return v ? '' : null; },
 		fromAttribute: (v)=>{ return v===null ? false : true; },
@@ -291,15 +290,14 @@ export const propTypes = {
 		fromAttribute: (v)=>{ return Number(v); },
 		fromProperty: (v)=>{ return v===void 0 ? 0 : Number(v); },
 	},
-};
-Object.freeze(propTypes);
+});
 
 class elementProperty {
 	
 	constructor(props){
 		this.enumerable = true;
 		this.configurable = true;
-		this.props = props;
+		this.config = props;
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
 		this.firstChangeEmitted = false;
@@ -310,7 +308,7 @@ class elementProperty {
 	}
 	
 	get(){
-		let { propertyStore, name, config, reflectFromAttribute } = this.props;
+		let { propertyStore, name, config, reflectFromAttribute } = this.config;
 		if(propertyStore.hasOwnProperty(name)) return propertyStore[name];
 		if(reflectFromAttribute){
 			let value = this.getValueFromAttribute();
@@ -320,7 +318,7 @@ class elementProperty {
 	}
 	
 	getValueFromAttribute(){
-		let { element, attribute, transformFromAttribute, config } = this.props;
+		let { element, attribute, transformFromAttribute, config } = this.config;
 		if(config.readOnly) return;
 		if(transformFromAttribute){
 			if(this.transformingFromAttribute) return;
@@ -333,7 +331,7 @@ class elementProperty {
 	}
 	
 	setValueViaAttribute(newValue){
-		let { element, transformFromAttribute, config } = this.props;
+		let { element, transformFromAttribute, config } = this.config;
 		if(config.readOnly) return;
 		if(transformFromAttribute){
 			this.transformingFromAttribute = true;
@@ -345,7 +343,7 @@ class elementProperty {
 	}
 	
 	reflectValueToAttribute(newValue){
-		let { element, attribute, reflectToAttribute, transformToAttribute } = this.props;
+		let { element, attribute, reflectToAttribute, transformToAttribute } = this.config;
 		if(reflectToAttribute){
 			let currentValue = element.getAttribute(attribute);
 			if(transformToAttribute) newValue = mixinClass.fn(transformToAttribute,element,[newValue]);
@@ -358,13 +356,11 @@ class elementProperty {
 	}
 	
 	set(newValue){
-		let { propertyStore, element, name, reflectToAttribute, reflectFromProperty, transformFromProperty } = this.props;
+		let { propertyStore, element, name, reflectToAttribute, reflectFromProperty, transformFromProperty } = this.config;
 		let settingViaAttribute = this.settingViaAttribute;
 		this.settingViaAttribute = false;
 		if(!settingViaAttribute && !reflectFromProperty) return;
-		if(!settingViaAttribute && transformFromProperty){
-			newValue = mixinClass.fn(transformFromProperty,element,[newValue]);
-		}
+		if(!settingViaAttribute && transformFromProperty) newValue = mixinClass.fn(transformFromProperty,element,[newValue]);
 		let inPropStore = propertyStore.hasOwnProperty(name);
 		let oldValue = this.get();
 		if(!inPropStore || oldValue!==newValue) propertyStore[name] = newValue;
@@ -373,7 +369,7 @@ class elementProperty {
 	}
 	
 	emitChange(oldValue,newValue){
-		let { element, name, config, onPropertySet, hasObserver, isObserverString, eventName, setDescriptors } = this.props;
+		let { element, name, config, onPropertySet, hasObserver, isObserverString, eventName, setDescriptors } = this.config;
 		if(this.ignoreEmitChange) return;
 		if(!this.firstChangeEmitted) this.firstChangeEmitted = true;
 		if(onPropertySet || hasObserver || eventName!==null){
@@ -387,5 +383,6 @@ class elementProperty {
 	}
 	
 }
+Object.freeze(elementProperty);
 
 class propertyChangeDetails { constructor(obj){ Object.assign(this,obj); } }
