@@ -14,6 +14,16 @@
     "type": "git",
     "url": "https://github.com/Jashepp/customElements-mixinPropertiesAttributes"
   },
+  "keywords": [
+    "synchronization",
+    "data-binding",
+    "html",
+    "mixin",
+    "webcomponent",
+    "customelement",
+    "web-component",
+    "custom-element"
+  ],
   "devDependencies": {
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
