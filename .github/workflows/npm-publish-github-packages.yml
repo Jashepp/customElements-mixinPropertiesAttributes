@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.2.0
+      - uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - run: npm ci
@@ -23,8 +23,10 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v3.2.0
-      - uses: actions/setup-node@v3.5.1
+      # https://github.com/actions/checkout/releases
+      - uses: actions/checkout@v3.3.0
+      # https://github.com/actions/checkout/releases
+      - uses: actions/setup-node@v3.6.0
         with:
           node-version: 18
           registry-url: https://npm.pkg.github.com/

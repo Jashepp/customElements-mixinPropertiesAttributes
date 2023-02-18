@@ -3,19 +3,20 @@ name: Tests
 on: [push]
 
 # https://docs.cypress.io/guides/continuous-integration/github-actions
-# https://github.com/cypress-io/github-action
 jobs:
   
   tests-electron:
     runs-on: ubuntu-latest
     name: Tests on Electron
     steps:
+      # https://github.com/actions/checkout/releases
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm i --package-lock-only
+      # https://github.com/cypress-io/github-action/releases
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.0
+        uses: cypress-io/github-action@v5.0.9
         with:
           browser: electron
           install: true
@@ -34,11 +35,11 @@ jobs:
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.0
+        uses: cypress-io/github-action@v5.0.9
         with:
           browser: chrome
           install: true
@@ -56,11 +57,11 @@ jobs:
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.0
+        uses: cypress-io/github-action@v5.0.9
         with:
           browser: firefox
           install: true
@@ -78,11 +79,11 @@ jobs:
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm i --package-lock-only
       - name: Cypress run
-        uses: cypress-io/github-action@v5.0.0
+        uses: cypress-io/github-action@v5.0.9
         with:
           browser: edge
           install: true
@@ -101,7 +102,7 @@ jobs:
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm install
       - name: Cypress run
@@ -123,7 +124,7 @@ jobs:
       options: --user 1001
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.2.0
+        uses: actions/checkout@v3.3.0
       - name: Build package-lock
         run: npm install
       - name: Cypress run
