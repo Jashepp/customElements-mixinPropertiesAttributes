@@ -69,7 +69,7 @@ export class mixinClass {
 			if('fromAttribute' in Object(type)) return !!type.fromAttribute;
 			return false;
 		}).map(([name,config])=>{
-			return ('attribute' in config ? config.attribute+'' : ''+name).toLowerCase();
+			return ('attribute' in config ? config.attribute+'' : name).toLowerCase();
 		});
 	}
 
@@ -93,7 +93,7 @@ export class mixinClass {
 		argOptions = Object(argOptions);
 		let protoTree = mixinClass.getConstructorTree(Object.getPrototypeOf(this));
 		let propsConfig = mixinClass.buildConstructorPropsConfig(propertiesName,protoTree);
-		let propsLower = Object.keys(propsConfig).map(name=>(''+name).toLowerCase());
+		let propsLower = Object.keys(propsConfig).map(name=>name.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
@@ -113,8 +113,8 @@ export class mixinClass {
 	static ce_mixinConstructorSetupProp({ name, config, protoTree, propsConfig, argOptions }){
 		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = argOptions;
 		if('attribute' in config && typeof config.attribute!='string') throw new Error(`Unable to setup property '${name}' on ${this.constructor.name}. Attribute is not a string.`);
-		let attribute = ('attribute' in config ? config.attribute+'' : ''+name).toLowerCase();
-		let combinedName = name==attribute || name.toLowerCase()==attribute ? name : name+'/'+attribute;
+		let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
+		let combinedName = name===attribute || name.toLowerCase()===attribute ? name : name+'/'+attribute;
 		config.propertyName = name;
 		this[mixinClass.symbols.propsConfigByAttribute][attribute] = config;
 		if(protectedProperties.indexOf(name)!==-1) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. '${name}' is a protected property.`);
@@ -135,10 +135,10 @@ export class mixinClass {
 		}
 		if(name!==attribute && name.toLowerCase()!==attribute){
 			Object.entries(propsConfig).forEach(([name2,config2])=>{
-				if(name==name2) return;
-				let attribute2 = ('attribute' in config2 ? config2.attribute+'' : ''+name2).toLowerCase();
-				let combinedName2 = name2==attribute2 || name2.toLowerCase()==attribute2 ? name2 : name2+'/'+attribute2;
-				if(attribute==attribute2) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists as a different property/attribute '${combinedName2}'.`);
+				if(name===name2) return;
+				let attribute2 = ('attribute' in config2 ? config2.attribute+'' : name2).toLowerCase();
+				let combinedName2 = name2===attribute2 || name2.toLowerCase()===attribute2 ? name2 : name2+'/'+attribute2;
+				if(attribute===attribute2) throw new Error(`Unable to setup property/attribute '${combinedName}' on ${this.constructor.name}. It already exists as a different property/attribute '${combinedName2}'.`);
 			});
 		}
 		for(let k in propertyDefaults){ if(!(k in config))config[k]=propertyDefaults[k]; }
