@@ -10,29 +10,56 @@ Mixin for Custom Elements (Web Components) to handle/sync properties and attribu
 
 This class mixin adds functionality to your [web components (custom elements v1)](https://web.dev/custom-elements-v1/) to help javascript properties and DOM element attributes be synchronised/reflected where configured. This allows automatic data-binding for both attributes and properties for a web component.
 
-This is written with vanilla JavaScript. No external dependencies required.
+This is written with vanilla JavaScript. No external dependencies, and no build system required.
 
 No conflicting properties/methods are added to your class(es). The only properties/methods that are not part of the web component standards is the `static get properties()` method (can be named anything you like) used for configuring properties, and a non-enumerable `Symbol` property. This mixin makes use of the `observedAttributes` and `attributeChangedCallback` web component methods.
 
 This JavaScript Module (ESM) exports a `mixinPropertiesAttributes(base)` method that will return a class which extends the provided `base` class.
 
-This was designed to help your [web components](https://web.dev/custom-elements-v1/) follow the [best practices](https://web.dev/custom-elements-best-practices/) mentioned on web.dev.
+This was designed to help your [web components](https://web.dev/custom-elements-v1/) follow the [best practices](https://web.dev/custom-elements-best-practices/) mentioned on web.dev, while avoiding huge frameworks or build systems.
 
-## Installation
+## Installation / Importing
 
-Note: This project is written with new ECMAScript features such as ESM, arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs).
+This library comes as an ES6 Module Script. It can be used within other Javascript ES6 Module Scripts, or in Classic Javascript Scripts.
 
-Install via [NPM][npm-url], or github NPM package at [@jashepp/ce-mixinprops](https://github.com/Jashepp/customElements-mixinPropertiesAttributes/pkgs/npm/ce-mixinprops)
+**NPM:** Install [NPM package][npm-url], or [GitHub NPM package](https://github.com/Jashepp/customElements-mixinPropertiesAttributes/pkgs/npm/ce-mixinprops), then use with a method below with `'./node_modules/ce-mixinprops/index.js'`.
 ```
 npm install ce-mixinprops --save
 ```
 
-Or use via `import` with a CDN
-```js
-import { mixinPropertiesAttributes, propTypes } from 'https://unpkg.com/ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops
+**ES6 Module Script:** Use via [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
+```html
+<script type="module">
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://unpkg.com/ce-mixinprops or https://cdn.jsdelivr.net/npm/ce-mixinprops
+// ...
+</script>
+```
+
+**Classic Script:** Use via [dynamic `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap).
+```html
+<script type="text/javascript">
+(async ()=>{ // using async await due to working with promises
+	const [
+		{ mixinPropertiesAttributes, propTypes }, // ce-mixinprops
+		// ... other import destructuring assignments
+	] = await Promise.all([
+		import('ce-mixinprops'), // or https://unpkg.com/ce-mixinprops or https://cdn.jsdelivr.net/npm/ce-mixinprops
+		// ... other imports
+	]);
+	// ...
+})();
+</script>
 ```
 
 Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
+
+## Compatability
+
+This project is written with new ES6 features such as arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs), although they have not yet been tested with this library.
+
+No build systems that transpile/compile files have yet been tested with this library either.
+
+The versioning for this library tries to follow [semver](https://semver.org/) rules . So when using this library through a NPM CDN like [unpkg.com](https://unpkg.com/), specify the last major or major & minor version that works with your project. Such as `https://unpkg.com/ce-mixinprops@1.x` for major v1 only with any minor & patch versions, or `https://unpkg.com/ce-mixinprops@1.11.x` for v1.11 major & minor with any patch versions.
 
 ## Examples
 
