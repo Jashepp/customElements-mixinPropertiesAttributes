@@ -30,7 +30,7 @@ npm install ce-mixinprops --save
 **ES6 Module Script:** Use via [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
 ```html
 <script type="module">
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://unpkg.com/ce-mixinprops or https://cdn.jsdelivr.net/npm/ce-mixinprops
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://unpkg.com/ce-mixinprops@1.x or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 // ...
 </script>
 ```
@@ -43,7 +43,7 @@ import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or http
 		{ mixinPropertiesAttributes, propTypes }, // ce-mixinprops
 		// ... other import destructuring assignments
 	] = await Promise.all([
-		import('ce-mixinprops'), // or https://unpkg.com/ce-mixinprops or https://cdn.jsdelivr.net/npm/ce-mixinprops
+		import('ce-mixinprops'), // or https://unpkg.com/ce-mixinprops@1.x or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 		// ... other imports
 	]);
 	// ...
@@ -67,7 +67,7 @@ Simple display toggle (Javascript Module).
 
 ```js
 // Before running this example, install or specify the correct import paths
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
 
 // Define a class with the mixin on HTMLElement (or a class that extends it)
 // * If you don't want the mixin within the class declaration, see below for alternate usage
@@ -161,7 +161,7 @@ Usage: `mixinPropertiesAttributes(base,[propertiesName='properties'])`
 Simply import this module and call the `mixinPropertiesAttributes` method while extending `HTMLElement` (or any class that already extends it).
 
 ```js
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
 
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
