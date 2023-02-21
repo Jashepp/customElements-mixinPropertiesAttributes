@@ -135,8 +135,8 @@ More examples are located within `./examples/` on the git [repository on GitHub]
 
 - Example 1 - Simple Toggle [[file]](./examples/1-simple-toggle.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/1-simple-toggle.html)
 - Example 2 - Using lit-html as the renderer [[file]](./examples/2-lit-html.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/2-lit-html.html)
-- Example 3 - Calling `mixinPropertiesAttributes` on an already declared class, with mixinConfig argument [[file]](./examples/3-after-declared-arg.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/3-after-declared-arg.html)
-- Example 4 - Calling `mixinPropertiesAttributes` on an already declared class, with injected mixinConfig [[file]](./examples/4-after-declared-inject.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/4-after-declared-inject.html)
+- Example 3 - Applying mixin on an already declared class, with mixinConfig argument [[file]](./examples/3-after-declared-arg.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/3-after-declared-arg.html)
+- Example 4 - Applying mixin on an already declared class, with injected mixinConfig [[file]](./examples/4-after-declared-inject.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/4-after-declared-inject.html)
 
 ## How To Use / API
 
@@ -368,6 +368,8 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 
 If the class does not extend the mixin, but instead has it applied afterwards, the [mixin configuration](#mixin-configuration) can instead be set using one of the methods below.
 
+These methods do not use `superArguments` since you can pass arguments to `super()` within the constructor directly.
+
 **Inject Method**: Using `mixinClass.symbols.injectMixinConfig` symbol within the constructor (notice extra `mixinClass` import variable):
 ```js
 import { mixinPropertiesAttributes, propTypes, mixinClass } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
@@ -385,8 +387,6 @@ class myCustomElement extends HTMLElement {
 // Define the custom element with the mixin applied after class declaration
 customElements.define('my-element',mixinPropertiesAttributes(myCustomElement));
 ```
-
-However the inject method does not use `superArguments` since you can pass arguments to `super()` within the constructor directly.
 
 **Argument Method**: Using the 3rd argument to `mixinPropertiesAttributes` function:
 ```js
