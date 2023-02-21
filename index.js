@@ -12,6 +12,7 @@
 const symbols = Object.freeze({
 	propsConfigByAttribute: Symbol('mixinProps-propsConfigByAttribute'),
 	elementProperty: Symbol('mixinProps-elementProperty'),
+	injectMixinConfig: Symbol('mixinProps-injectMixinConfig'),
 });
 
 export class mixinClass {
@@ -233,7 +234,7 @@ export class mixinClass {
 		Object.freeze(config);
 	}
 
-	static applyCEMixin(base,propertiesName='properties',mixinConfig={}){
+	static applyCEMixin(base,propertiesName='properties',applyMixinConfig={}){
 		return class mixinPropertiesAttributes extends (base||HTMLElement) {
 	
 			static get observedAttributes() {
@@ -245,10 +246,11 @@ export class mixinClass {
 				return mixinClass.ce_attributeChangedCallback.apply(this,[attribute,oldValue,newValue]);
 			}
 			
-			constructor(argOptions={},...argRest) {
-				argOptions = Object.assign({},Object(mixinConfig),Object(argOptions));
-				super(...(Object(argOptions).superArguments||[]),...argRest);
-				mixinClass.ce_mixinConstructor.apply(this,[argOptions,propertiesName]);
+			constructor(mixinConfig={},...argRest) {
+				mixinConfig = Object.assign({},Object(applyMixinConfig),Object(mixinConfig));
+				super(...(mixinConfig.superArguments||[]),...argRest);
+				if(this[mixinClass.symbols.injectMixinConfig]) Object.assign(mixinConfig,Object(this[mixinClass.symbols.injectMixinConfig]));
+				mixinClass.ce_mixinConstructor.apply(this,[mixinConfig,propertiesName]);
 			}
 			
 		};

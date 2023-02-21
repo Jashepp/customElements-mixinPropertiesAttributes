@@ -114,43 +114,29 @@ customElements.define('example-toggle',exampleToggle);
 ```
 
 HTML: (the `show` attribute will be set upon construction due to the default configured value above)
-
 ```html
 Hello, <example-toggle>Beautiful</example-toggle> World!
 ```
 
 Rendered Result:
-
 ```
 Hello, Beautiful World!
 ```
 
 Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change. Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.
 
-Or see the [example file](./examples/1-simple-toggle.html) for an interactive version.
+Or see the [example files](#more-examples) for interactive versions.
 
-If you don't want the mixin within the class declaration, it can also be applied afterwards instead:
-```js
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops
-
-// Define a class without the mixin (which still extends HTMLElement)
-class exampleToggle extends HTMLElement {
-	// ...
-}
-
-// Define a custom element with the mixin applied after class declaration
-customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
-```
-
-However, to pass in a [mixin's configuration](#mixin-configuration) with this method, provide it as the 3rd argument to `mixinPropertiesAttributes`.
+If you don't want the mixin within the class declaration, it can also [be applied afterwards instead](#mixin-configuration-post-declaration).
 
 ### More Examples
 
 More examples are located within `./examples/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include the examples directory.
 
-- [Example 1 - Simple Toggle](./examples/1-simple-toggle.html)
-- [Example 2 - Using lit-html as the renderer](./examples/2-lit-html.html)
-- [Example 3 - Calling `mixinPropertiesAttributes` on an already declared class](./examples/3-after-declared.html)
+- Example 1 - Simple Toggle [[file]](./examples/1-simple-toggle.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/1-simple-toggle.html)
+- Example 2 - Using lit-html as the renderer [[file]](./examples/2-lit-html.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/2-lit-html.html)
+- Example 3 - Calling `mixinPropertiesAttributes` on an already declared class, with mixinConfig argument [[file]](./examples/3-after-declared-arg.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/3-after-declared-arg.html)
+- Example 4 - Calling `mixinPropertiesAttributes` on an already declared class, with injected mixinConfig [[file]](./examples/4-after-declared-inject.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/4-after-declared-inject.html)
 
 ## How To Use / API
 
@@ -333,7 +319,7 @@ A flag is set internally during `reflectFromAttribute` so a `call stack overflow
 
 ### Mixin Configuration
 
-Upon construction, an optional options object can be passed to `super()` to configure this mixin.
+Upon construction, an optional options object can be passed to `super()` to configure this mixin - if the class extends the mixin (if not, see further below).
 
 | Property | Description (when specified) |
 |-|-|
@@ -376,6 +362,47 @@ class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	}
 	// ...
 }
+```
+
+### Mixin Configuration Post Declaration
+
+If the class does not extend the mixin, but instead has it applied afterwards, the [mixin configuration](#mixin-configuration) can instead be set using one of the methods below.
+
+**Inject Method**: Using `mixinClass.symbols.injectMixinConfig` symbol within the constructor (notice extra `mixinClass` import variable):
+```js
+import { mixinPropertiesAttributes, propTypes, mixinClass } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+// Define a class without the mixin (which still extends HTMLElement)
+class myCustomElement extends HTMLElement {
+	// ...
+	constructor(...args) {
+		super(...args);
+		this[mixinClass.symbols.injectMixinConfig] = {
+			propertyDefaults: { reflectToAttributeInConstructor:false }
+		};
+	}
+	// ...
+}
+// Define the custom element with the mixin applied after class declaration
+customElements.define('my-element',mixinPropertiesAttributes(myCustomElement));
+```
+
+However the inject method does not use `superArguments` since you can pass arguments to `super()` within the constructor directly.
+
+**Argument Method**: Using the 3rd argument to `mixinPropertiesAttributes` function:
+```js
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+// Define a class without the mixin (which still extends HTMLElement)
+class myCustomElement extends HTMLElement {
+	// ...
+	constructor(...args) {
+		super(...args);
+	}
+	// ...
+}
+// Define the custom element with the mixin applied after class declaration
+customElements.define('my-element',mixinPropertiesAttributes(myCustomElement,'properties',{
+	propertyDefaults: { reflectToAttributeInConstructor:false }
+}));
 ```
 
 ### Existing Properties

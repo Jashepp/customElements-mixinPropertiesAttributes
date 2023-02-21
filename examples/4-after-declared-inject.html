@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="module">
+		// Before running this example, install and specify the correct import paths
+		import { mixinPropertiesAttributes, mixinClass } from '../index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+
+		// Define a class without the mixin (which still extends HTMLElement)
+		class exampleToggle extends HTMLElement {
+			
+			// Define the behaviour/options of properties
+			static get properties() {
+				return {
+					show: {
+						type: Boolean,
+						value: true
+					},
+					hide: {
+						type: Boolean,
+						value: false
+					}
+				};
+			}
+			
+			// Toggle .style.display between none and previous value
+			set show(show) {
+				if(show) this.style.display = this._previousDisplay;
+				else {
+					this._previousDisplay = this.style.display || '';
+					if(this._previousDisplay==='none') this._previousDisplay = '';
+					this.style.display = 'none';
+				}
+				this.hide = !show;
+			}
+			
+			set hide(hide) {
+				this.show = !hide;
+			}
+			
+			constructor() {
+				super();
+				this.counter = 0;
+				this[mixinClass.symbols.injectMixinConfig] = {
+					onPropertySet: ({ element,name,config,newValue,oldValue })=>{
+						element.counter++;
+						console.log("onPropertySet",{ element,name,config,newValue,oldValue });
+					}
+				};
+				this._previousDisplay = this.style.display || '';
+			}
+			
+		}
+
+		// Define a custom element with the mixin applied after class declaration
+		customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
+	</script>
+</head>
+<body>
+	<p>This example is the same as 1-simple-toggle, except that it calls mixinPropertiesAttributes on the class, after has been declared.</p>
+	<p>Freely remove the `show` or `hide` attributes in your browser developer tools and watch the property and rendered result change.
+	<br />Also change the `show` and/or `hide` properties on the element object itself via your developer tools console and watch the attribute and rendered result change.</p>
+	<div onclick="document.querySelector('#exampleToggle').show = !document.querySelector('#exampleToggle').show">
+		Hello, <example-toggle id="exampleToggle">Beautiful</example-toggle> World!
+	</div>
+</body>
+</html>

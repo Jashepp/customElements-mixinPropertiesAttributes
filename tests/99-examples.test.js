@@ -56,20 +56,58 @@ describe("Examples",()=>{
 			})
 	});
 
-	it("3-after-declared",()=>{
-		cy.visit('../examples/3-after-declared.html');
+	it("3-after-declared-arg",()=>{
+		cy.visit('../examples/3-after-declared-arg.html');
 		cy.get('example-toggle').parent()
 			.should(([e])=>{
 				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
 			})
-			.click()
+			.click();
+		cy.get('example-toggle')
+			.should(([e])=>{
+				expect(e).to.have.property('counter',2);
+			});
+		cy.get('example-toggle').parent()
 			.should(([e])=>{
 				expect(e.innerText,'.innerText').to.eq('Hello, World!');
 			})
-			.click()
+			.click();
+		cy.get('example-toggle')
+			.should(([e])=>{
+				expect(e).to.have.property('counter',4);
+			});
+		cy.get('example-toggle').parent()
 			.should(([e])=>{
 				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
+			})
+			.click();
+	});
+
+	it("4-after-declared-inject",()=>{
+		cy.visit('../examples/4-after-declared-inject.html');
+		cy.get('example-toggle').parent()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
+			})
+			.click();
+		cy.get('example-toggle')
+			.should(([e])=>{
+				expect(e).to.have.property('counter',2);
 			});
+		cy.get('example-toggle').parent()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, World!');
+			})
+			.click();
+		cy.get('example-toggle')
+			.should(([e])=>{
+				expect(e).to.have.property('counter',4);
+			});
+		cy.get('example-toggle').parent()
+			.should(([e])=>{
+				expect(e.innerText,'.innerText').to.eq('Hello, Beautiful World!');
+			})
+			.click();
 	});
 
 });

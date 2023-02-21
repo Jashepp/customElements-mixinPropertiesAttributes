@@ -39,13 +39,19 @@
 			
 			constructor() {
 				super();
+				this.counter = 0;
 				this._previousDisplay = this.style.display || '';
 			}
 			
 		}
 
 		// Define a custom element with the mixin applied after class declaration
-		customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle));
+		customElements.define('example-toggle',mixinPropertiesAttributes(exampleToggle,void 0,{
+			onPropertySet: ({ element,name,config,newValue,oldValue })=>{
+				element.counter++;
+				console.log("onPropertySet",{ element,name,config,newValue,oldValue });
+			}
+		}));
 	</script>
 </head>
 <body>
