@@ -55,6 +55,8 @@ export class mixinClass {
 		return propsConfig;
 	};
 
+	static objHasOwn(obj,key){ return Object.prototype.hasOwnProperty.call(obj,key); }
+
 	static fn(fn,proto,args){
 		if(fn) return fn.prototype ? fn.apply(proto,args) : fn.call(proto,...args,proto);
 	}
@@ -112,7 +114,7 @@ export class mixinClass {
 	}
 	
 	static ce_mixinConstructorSetupProp({ name, config, protoTree, propsConfig, mixinConfig }){
-		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = mixinConfig;
+		let { protectedProperties=[], protectedAttributes=[], propertyStore=Object.create(null), onPropertySet, propertyDefaults={} } = mixinConfig;
 		if('attribute' in config && typeof config.attribute!='string') throw new Error(`Unable to setup property '${name}' on ${this.constructor.name}. Attribute is not a string.`);
 		let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
 		let combinedName = name===attribute || name.toLowerCase()===attribute ? name : name+'/'+attribute;
@@ -311,7 +313,7 @@ class elementProperty {
 	
 	get(){
 		let { propertyStore, name, config, reflectFromAttribute } = this.config;
-		if(propertyStore.hasOwnProperty(name)) return propertyStore[name];
+		if(mixinClass.objHasOwn(propertyStore,name)) return propertyStore[name];
 		if(reflectFromAttribute){
 			let value = this.getValueFromAttribute();
 			if(value!==void 0) return propertyStore[name] = value;
@@ -363,7 +365,7 @@ class elementProperty {
 		this.settingViaAttribute = false;
 		if(!settingViaAttribute && !reflectFromProperty) return;
 		if(!settingViaAttribute && transformFromProperty) newValue = mixinClass.fn(transformFromProperty,element,[newValue]);
-		let inPropStore = propertyStore.hasOwnProperty(name);
+		let inPropStore = mixinClass.objHasOwn(propertyStore,name);
 		let oldValue = this.get();
 		if(!inPropStore || oldValue!==newValue) propertyStore[name] = newValue;
 		if(!settingViaAttribute && reflectToAttribute) this.reflectValueToAttribute(newValue);
