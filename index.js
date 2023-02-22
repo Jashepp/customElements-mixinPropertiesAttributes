@@ -236,8 +236,11 @@ export class mixinClass {
 		Object.freeze(config);
 	}
 
-	static applyCEMixin(base,propertiesName='properties',applyMixinConfig={}){
-		return class mixinPropertiesAttributes extends (base||HTMLElement) {
+	static applyCEMixin(base=HTMLElement,propertiesName='properties',applyMixinConfig={}){
+		let useCache = !applyMixinConfig || Object.keys(Object(applyMixinConfig)).length===0;
+		let cacheList = useCache && base && mixinClass.classCache.get(base);
+		let cachedClass = useCache && cacheList && cacheList[propertiesName];
+		let c = cachedClass || class mixinPropertiesAttributes extends base {
 	
 			static get observedAttributes() {
 				return (super.observedAttributes||[]).concat(mixinClass.ce_observedAttributes.apply(this,[propertiesName]));
@@ -256,9 +259,13 @@ export class mixinClass {
 			}
 			
 		};
+		if(useCache && !cacheList) mixinClass.classCache.set(base,cacheList=Object.create(null));
+		if(useCache && !cachedClass) cacheList[propertiesName] = c;
+		return c;
 	}
 	
 }
+mixinClass.classCache = new WeakMap();
 Object.freeze(mixinClass);
 
 /**
