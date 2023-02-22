@@ -90,15 +90,15 @@ export class mixinClass {
 		}
 	}
 	
-	static ce_mixinConstructor(argOptions,propertiesName){
-		argOptions = Object(argOptions);
+	static ce_mixinConstructor(mixinConfig,propertiesName){
+		mixinConfig = Object(mixinConfig);
 		let protoTree = mixinClass.getConstructorTree(Object.getPrototypeOf(this));
 		let propsConfig = mixinClass.buildConstructorPropsConfig(propertiesName,protoTree);
 		let propsLower = Object.keys(propsConfig).map(name=>name.toLowerCase());
 		for(let i=0,l=propsLower.length; i<l; i++){
 			if(propsLower.indexOf(propsLower[i])!==i) throw new Error(`Unable to setup property/attribute '${propsLower[i]}' on ${this.constructor.name}. It is a duplicate property (not case sensitive).`);
 		}
-		argOptions.protectedAttributes = (argOptions.protectedAttributes||[]).map(a=>a.toLowerCase());
+		mixinConfig.protectedAttributes = (mixinConfig.protectedAttributes||[]).map(a=>a.toLowerCase());
 		this[mixinClass.symbols.propsConfigByAttribute] = {};
 		Object.entries(propsConfig)
 		.sort(([a,ac],[b,bc])=>{
@@ -107,12 +107,12 @@ export class mixinClass {
 			return ao && !bo ? -1 : (!ao && bo ? 1 : 0);
 		})
 		.forEach(([name,config])=>{
-			mixinClass.ce_mixinConstructorSetupProp.apply(this,[{ name, config, protoTree, propsConfig, argOptions }]);
+			mixinClass.ce_mixinConstructorSetupProp.apply(this,[{ name, config, protoTree, propsConfig, mixinConfig }]);
 		});
 	}
 	
-	static ce_mixinConstructorSetupProp({ name, config, protoTree, propsConfig, argOptions }){
-		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = argOptions;
+	static ce_mixinConstructorSetupProp({ name, config, protoTree, propsConfig, mixinConfig }){
+		let { protectedProperties=[], protectedAttributes=[], propertyStore={}, onPropertySet, propertyDefaults={} } = mixinConfig;
 		if('attribute' in config && typeof config.attribute!='string') throw new Error(`Unable to setup property '${name}' on ${this.constructor.name}. Attribute is not a string.`);
 		let attribute = ('attribute' in config ? config.attribute+'' : name).toLowerCase();
 		let combinedName = name===attribute || name.toLowerCase()===attribute ? name : name+'/'+attribute;
