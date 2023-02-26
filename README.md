@@ -30,7 +30,7 @@ npm install ce-mixinprops --save
 **ES6 Module Script:** Use via [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
 ```html
 <script type="module">
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://unpkg.com/ce-mixinprops@1.x or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 // ...
 </script>
 ```
@@ -43,7 +43,7 @@ import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or http
 		{ mixinPropertiesAttributes, propTypes }, // ce-mixinprops
 		// ... other import destructuring assignments
 	] = await Promise.all([
-		import('ce-mixinprops'), // or https://unpkg.com/ce-mixinprops@1.x or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
+		import('ce-mixinprops'), // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 		// ... other imports
 	]);
 	// ...
@@ -59,7 +59,7 @@ This project is written with new ES6 features such as arrow functions, object de
 
 No build systems that transpile/compile files have yet been tested with this library either.
 
-The versioning for this library tries to follow [semver](https://semver.org/) rules . So when using this library through a NPM CDN like [unpkg.com](https://unpkg.com/), specify the last major or major & minor version that works with your project. Such as `https://unpkg.com/ce-mixinprops@1.x` for major v1 only with any minor & patch versions, or `https://unpkg.com/ce-mixinprops@1.11.x` for v1.11 major & minor with any patch versions.
+The versioning for this library tries to follow [semver](https://semver.org/) rules . So when using this library through a NPM CDN like [cdn.jsdelivr.net](https://cdn.jsdelivr.net/), specify the last major or major & minor version that works with your project. Such as `https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x` for major v1 only with any minor & patch versions, or `https://cdn.jsdelivr.net/npm/ce-mixinprops@1.11.x` for v1.11 major & minor with any patch versions.
 
 ## Examples
 
@@ -67,7 +67,7 @@ Simple display toggle (Javascript Module).
 
 ```js
 // Before running this example, install or specify the correct import paths
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 
 // Define a class with the mixin on HTMLElement (or a class that extends it)
 // * If you don't want the mixin within the class declaration, see below for alternate usage
@@ -147,7 +147,7 @@ Usage: `mixinPropertiesAttributes(base,[propertiesName='properties'])`
 Simply import this module and call the `mixinPropertiesAttributes` method while extending `HTMLElement` (or any class that already extends it).
 
 ```js
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 
 class myCustomElement extends mixinPropertiesAttributes(HTMLElement) {
 	// ...
@@ -372,7 +372,7 @@ These methods do not use `superArguments` since you can pass arguments to `super
 
 **Inject Method**: Using `mixinClass.symbols.injectMixinConfig` symbol within the constructor (notice extra `mixinClass` import variable):
 ```js
-import { mixinPropertiesAttributes, propTypes, mixinClass } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+import { mixinPropertiesAttributes, propTypes, mixinClass } from 'ce-mixinprops/index.js'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 // Define a class without the mixin (which still extends HTMLElement)
 class myCustomElement extends HTMLElement {
 	// ...
@@ -390,7 +390,7 @@ customElements.define('my-element',mixinPropertiesAttributes(myCustomElement));
 
 **Argument Method**: Using the 3rd argument to `mixinPropertiesAttributes` function:
 ```js
-import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://unpkg.com/ce-mixinprops@1.x
+import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops/index.js'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 // Define a class without the mixin (which still extends HTMLElement)
 class myCustomElement extends HTMLElement {
 	// ...
