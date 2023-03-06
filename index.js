@@ -84,9 +84,9 @@ export class mixinClass {
 			let config = propsConfigByAttribute[attribute];
 			let eProp = config[mixinClass.symbols.elementProperty];
 			let setValue = true;
-			if(attribute in eProp.skipNextAttribChange){
-				if(eProp.skipNextAttribChange[attribute]===newValue) setValue = false;
-				eProp.skipNextAttribChange[attribute] = void 0;
+			if(eProp.skipNextAttribChange!==void 0){
+				if(eProp.skipNextAttribChange===newValue) setValue = false;
+				eProp.skipNextAttribChange = void 0;
 			}
 			if(setValue) eProp.setValueViaAttribute(newValue);
 		}
@@ -209,7 +209,7 @@ export class mixinClass {
 		let delayChangeInConstructor = 'delayChangeInConstructor' in config ? !!config.delayChangeInConstructor : true;
 		let attribExists = this.hasAttribute(attribute);
 		let attribValue = eProp.getValueFromAttribute();
-		if(attribExists) eProp.skipNextAttribChange[attribute] = attribValue;
+		if(attribExists) eProp.skipNextAttribChange = attribValue;
 		if(existingPropExists && attribExists) existingPropExists = false;
 		if(!existingPropExists && !attribExists && reflectToAttribute && reflectToAttributeInConstructor && defaultValue!==null){
 			eProp.reflectValueToAttribute(defaultValue); // Set default value
@@ -315,7 +315,7 @@ class elementProperty {
 		this.ignoreEmitChange = false;
 		this.transformingFromAttribute = false;
 		this.settingViaAttribute = false;
-		this.skipNextAttribChange = {};
+		this.skipNextAttribChange = void 0;
 	}
 	
 	get(){
@@ -359,7 +359,7 @@ class elementProperty {
 			let currentValue = element.getAttribute(attribute);
 			if(transformToAttribute) newValue = mixinClass.fn(transformToAttribute,element,[newValue]);
 			if(currentValue!==newValue){
-				this.skipNextAttribChange[attribute] = newValue===null ? null : ''+newValue;
+				this.skipNextAttribChange = newValue===null ? null : ''+newValue;
 				if(newValue===null) element.removeAttribute(attribute);
 				else element.setAttribute(attribute,newValue);
 			}
