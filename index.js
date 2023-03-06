@@ -305,10 +305,10 @@ export const propTypes = Object.freeze({
 
 class elementProperty {
 	
-	constructor(props){
+	constructor(config){
 		this.enumerable = true;
 		this.configurable = true;
-		this.config = props;
+		this.config = config;
 		this.get = this.get.bind(this);
 		this.set = this.set.bind(this);
 		this.firstChangeEmitted = false;
