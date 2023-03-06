@@ -356,9 +356,8 @@ class elementProperty {
 	reflectValueToAttribute(newValue){
 		let { element, attribute, reflectToAttribute, transformToAttribute } = this.config;
 		if(reflectToAttribute){
-			let currentValue = element.getAttribute(attribute);
 			if(transformToAttribute) newValue = mixinClass.fn(transformToAttribute,element,[newValue]);
-			if(currentValue!==newValue){
+			if(element.getAttribute(attribute)!==newValue){
 				this.skipNextAttribChange = newValue===null ? null : ''+newValue;
 				if(newValue===null) element.removeAttribute(attribute);
 				else element.setAttribute(attribute,newValue);
