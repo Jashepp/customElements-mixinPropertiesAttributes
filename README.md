@@ -22,12 +22,17 @@ This was designed to help your [web components](https://web.dev/custom-elements-
 
 This library comes as an ES6 Module Script. It can be used within other Javascript ES6 Module Scripts, or in Classic Javascript Scripts.
 
-**NPM:** Install [NPM package][npm-url], or [GitHub NPM package](https://github.com/Jashepp/customElements-mixinPropertiesAttributes/pkgs/npm/ce-mixinprops), then use with a method below with `'./node_modules/ce-mixinprops/index.js'`.
+**Install via NPM:** with the [NPM package][npm-url]
 ```
-npm install ce-mixinprops --save
+npm install ce-mixinprops
 ```
 
-**ES6 Module Script:** Use via [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
+**Install via NPM from Github:** with a [GitHub Tag][github-tags] to specify version (specifed as #hash, must be exact)
+```
+npm install jashepp/customElements-mixinPropertiesAttributes#v1.11.0
+```
+
+**Use via ESM:** with a [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
 ```html
 <script type="module">
 import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
@@ -35,31 +40,25 @@ import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or http
 </script>
 ```
 
-**Classic Script:** Use via [dynamic `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap).
+**Use via CommonJS:** with a [dynamic `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap).
 ```html
 <script type="text/javascript">
-(async ()=>{ // using async await due to working with promises
-	const [
-		{ mixinPropertiesAttributes, propTypes }, // ce-mixinprops
-		// ... other import destructuring assignments
-	] = await Promise.all([
-		import('ce-mixinprops'), // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
-		// ... other imports
-	]);
+(async ()=>{
+	const { mixinPropertiesAttributes, propTypes } = await import('ce-mixinprops'); // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
 	// ...
 })();
 </script>
 ```
 
-Or [download the latest release][github-releases], or git clone the [repository on GitHub][github-branch].
+Or [download the latest release][github-releases], or [use github packages](https://github.com/Jashepp/customElements-mixinPropertiesAttributes/pkgs/npm/ce-mixinprops), or git clone the [repository on GitHub][github-url].
 
 ## Compatability
 
-This project is written with new ES6 features such as arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs), although they have not yet been tested with this library.
+This project is written with ES6 features such as arrow functions, object destructuring and etc. If you want to use this on older browsers, you may need to use a transpiler / bundling application, along with a [polyfill](https://github.com/webcomponents/polyfills/tree/master/packages/webcomponentsjs), although they have not yet been tested with this library.
 
 No build systems that transpile/compile files have yet been tested with this library either.
 
-The versioning for this library tries to follow [semver](https://semver.org/) rules . So when using this library through a NPM CDN like [cdn.jsdelivr.net](https://cdn.jsdelivr.net/), specify the last major or major & minor version that works with your project. Such as `https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x` for major v1 only with any minor & patch versions, or `https://cdn.jsdelivr.net/npm/ce-mixinprops@1.11.x` for v1.11 major & minor with any patch versions.
+The versioning for this library tries to follow [semver](https://semver.org/) rules . So when using this library through a NPM CDN like [cdn.jsdelivr.net](https://cdn.jsdelivr.net/), specify the last major or major & minor version that works with your project. Such as `ce-mixinprops@1.x` for major v1 only with any minor & patch versions, or `ce-mixinprops@1.11.x` for v1.11 major & minor with any patch versions.
 
 ## Examples
 
@@ -131,12 +130,12 @@ If you don't want the mixin within the class declaration, it can also [be applie
 
 ### More Examples
 
-More examples are located within `./examples/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include the examples directory.
+More examples are located within `./examples/` on the git [repository on GitHub][github-url] or locally if pulled. NPM version does **not** include the examples directory.
 
-- Example 1 - Simple Toggle [[file]](./examples/1-simple-toggle.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/1-simple-toggle.html)
-- Example 2 - Using lit-html as the renderer [[file]](./examples/2-lit-html.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/2-lit-html.html)
-- Example 3 - Applying mixin on an already declared class, with mixinConfig argument [[file]](./examples/3-after-declared-arg.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/3-after-declared-arg.html)
-- Example 4 - Applying mixin on an already declared class, with injected mixinConfig [[file]](./examples/4-after-declared-inject.html) [[live]](https://dev.mivor.net/static/ce-mixinprops/examples/4-after-declared-inject.html)
+- Example 1 - Simple Toggle [[file]](./examples/1-simple-toggle.html) [[codepen]](https://codepen.io/Jashepp/pen/xxmXNjp)
+- Example 2 - Using lit-html as the renderer [[file]](./examples/2-lit-html.html) [[codepen]](https://codepen.io/Jashepp/pen/VwqMOpx)
+- Example 3 - Applying mixin on an already declared class, with mixinConfig argument [[file]](./examples/3-after-declared-arg.html) [[codepen]](https://codepen.io/Jashepp/pen/wvRPeva)
+- Example 4 - Applying mixin on an already declared class, with injected mixinConfig [[file]](./examples/4-after-declared-inject.html) [[codepen]](https://codepen.io/Jashepp/pen/KKbyqpN)
 
 ## How To Use / API
 
@@ -475,14 +474,14 @@ If both a same-named property **and** attribute exists before the element is def
 
 ## Tests
 
-Tests are located within `./tests/` on the git [repository on GitHub][github-branch] or locally if pulled. NPM version does **not** include tests.
+Tests are located within `./tests/` on the git [repository on GitHub][github-url] or locally if pulled. NPM version does **not** include tests.
 
 To get started with tests, enter local directory of this repository and run:
 ```
 npm install --only=dev
 ```
 
-This should install `cypress` and other dev dependancies needed to run the tests.
+This should install `cypress` and other dev dependencies needed to run the tests.
 
 To run a UI interactive version of the tests using cypress, run:
 ```
@@ -501,7 +500,7 @@ npm run watch:test
 
 ## Contributors
 
-To submit a contribution, create issues or pull requests on the GitHub project.
+To submit a contribution, create issues or pull requests on the [GitHub repository][github-url].
 
 Please be sure to run tests after any changes.
 
@@ -538,7 +537,6 @@ Github Repository: [https://github.com/Jashepp/customElements-mixinPropertiesAtt
 NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 
 [github-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
-[github-branch]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
 [github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
 [github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
 [github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml/badge.svg
