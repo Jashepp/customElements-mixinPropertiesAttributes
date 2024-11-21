@@ -4,6 +4,11 @@ on: [push]
 
 # https://docs.cypress.io/guides/continuous-integration/github-actions
 jobs:
+
+  # Cypress Image Versions
+  # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers
+  # Newest: https://hub.docker.com/r/cypress/browsers/tags?name=chrome
+  # Oldest: https://hub.docker.com/r/cypress/browsers/tags?name=node16&ordering=-last_updated
   
   tests-electron:
     runs-on: ubuntu-latest
@@ -28,10 +33,9 @@ jobs:
   
   tests-chrome:
     runs-on: ubuntu-latest
-    name: Tests on Chrome
+    name: Tests on Chrome v131
     container:
-      # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers#cypressbrowsers
-      image: cypress/browsers:node16.18.0-chrome107-ff106-edge
+      image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
       - name: Checkout
@@ -51,9 +55,9 @@ jobs:
   
   tests-firefox:
     runs-on: ubuntu-latest
-    name: Tests on Firefox
+    name: Tests on Firefox v132
     container:
-      image: cypress/browsers:node16.18.0-chrome107-ff106-edge
+      image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
       - name: Checkout
@@ -73,9 +77,9 @@ jobs:
   
   tests-edge:
     runs-on: ubuntu-latest
-    name: Tests on Edge
+    name: Tests on Edge v131
     container:
-      image: cypress/browsers:node16.18.0-chrome107-ff106-edge
+      image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
       - name: Checkout
@@ -93,12 +97,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
+  # Old Browsers
+  
   tests-chrome-old:
     runs-on: ubuntu-latest
     name: Tests on Chrome v94
     container:
-      # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers#cypressbrowsers
-      # https://hub.docker.com/r/cypress/browsers/tags?name=chrome91
       image: cypress/browsers:node16.5.0-chrome94-ff93
       options: --user 1001
     steps:
