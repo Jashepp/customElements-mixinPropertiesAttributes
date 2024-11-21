@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="text/javascript" src="../index.umd.min.js"></script>
+	<script type="module">
+		const { mixinPropertiesAttributes } = window.ceMixinProps;
+		export class exampleToggle extends mixinPropertiesAttributes(HTMLElement) {
+			static get properties() {
+				return {
+					show: {
+						type: Boolean,
+						value: true
+					},
+					hide: {
+						type: Boolean,
+						value: false
+					}
+				};
+			}
+			set show(show) {
+				if(show) this.style.display = this._previousDisplay;
+				else {
+					this._previousDisplay = this.style.display || '';
+					if(this._previousDisplay==='none') this._previousDisplay = '';
+					this.style.display = 'none';
+				}
+				this.hide = !show;
+			}
+			set hide(hide) {
+				this.show = !hide;
+			}
+			constructor() {
+				super();
+				this._previousDisplay = this.style.display || '';
+			}
+		}
+		customElements.define('example-toggle',exampleToggle);
+	</script>
+</head>
+<body>
+	<div onclick="document.querySelector('#exampleToggle').show = !document.querySelector('#exampleToggle').show">
+		Hello, <example-toggle id="exampleToggle">Beautiful</example-toggle> World!
+	</div>
+</body>
+</html>

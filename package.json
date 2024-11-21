@@ -5,8 +5,17 @@
   "main": "index.js",
   "exports": {
     ".": "./index.js",
+    "./index.js": "./index.js",
+    "./index.min.js": "./index.min.js",
+    "./index.umd.min.js": "./index.umd.min.js",
     "./package.json": "./package.json",
     "./cypress.config.js": "./cypress.config.js"
+  },
+  "browser": {
+    "ce-mixinprops": "./index.js",
+    "./index.js": "./index.js",
+    "./index.min.js": "./index.min.js",
+    "./index.umd.min.js": "./index.umd.min.js"
   },
   "author": "unchosen.aus@gmail.com",
   "license": "MIT",
@@ -25,21 +34,28 @@
     "custom-element"
   ],
   "devDependencies": {
-    "concurrently": "^7.6.0",
+    "browserify": "^17.0.1",
+    "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "cypress": "^12.6.0",
+    "cypress": "^13.13.0",
+    "esmify": "^2.1.1",
     "http-server": "^14.1.1",
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.1.4",
+    "uglify-js": "^3.19.3"
   },
   "scripts": {
+    "build": "concurrently --names UMD,Module \"npm run build:umd\" \"npm run build:module\"",
+    "build:umd": "browserify -r ./index.js -p esmify -s ceMixinProps | uglifyjs -c -o ./index.umd.min.js",
+    "build:module": "uglifyjs ./index.js --source-map --no-annotations -c -o ./index.min.js",
     "server": "npx --no --node-options=--no-deprecation http-server ./ -s -c-1 -p 8181",
-    "server:and": "cross-env CONCURRENTLY_KILL_OTHERS=true CONCURRENTLY_SUCCESS=!command-0 concurrently --names S,C \"npm run server\"",
+    "server:and": "cross-env CONCURRENTLY_KILL_OTHERS=true CONCURRENTLY_SUCCESS=!command-0 concurrently --names Server,Test \"npm run server\"",
     "cypress:install": "cypress install",
     "cypress": "cypress open",
     "cypress+server": "npm run server:and -- \"npm run cypress\"",
     "cypress:cli": "cypress run",
-    "test": "npm run server:and -- \"npm run cypress:cli\"",
+    "cypress:workflow": "npm run build && npm run server",
+    "test": "npm run build && npm run server:and -- \"npm run cypress:cli\"",
     "watch:test": "npm run server:and -- \"npm run watch:test:cypress\"",
-    "watch:test:cypress": "npx --no --node-options=--input-type=module nodemon --watch ./*.js --watch ./tests/ --exec npm run cypress:cli"
+    "watch:test:cypress": "npx --no --node-options=--input-type=module nodemon --watch ./index.js --watch ./tests/ --exec \"npm run build && npm run cypress:cli\""
   }
 }
