@@ -1,7 +1,8 @@
 # ce-mixinprops
 
 [![NPM Version][npm-image]][npm-url]
-[![Downloads Stats][npm-downloads]][npm-url]
+[![NPM Stats][npm-downloads]][npm-url]
+[![jsDelivr Stats][jsdelivr-badge]][jsdelivr-url]
 [![Tests][github-tests-badge]][github-tests-url]
 
 Mixin for Custom Elements (Web Components) to handle/sync properties and attributes.
@@ -20,7 +21,7 @@ This was designed to help your [web components](https://web.dev/custom-elements-
 
 ## Installation / Importing
 
-This library comes as an ES6 Module Script. It can be used within other Javascript ES6 Module Scripts, or in Classic Javascript Scripts.
+This library comes as a Module. It can be used within other Javascript Modules, or in Classic Javascript Scripts.
 
 **Install via NPM:** with the [NPM package][npm-url]
 ```
@@ -32,7 +33,7 @@ npm install ce-mixinprops
 npm install jashepp/customElements-mixinPropertiesAttributes#v1.11.0
 ```
 
-**Use via ESM:** with a [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
+**Use via Module:** with a [module `import`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import), with a local file, [CDN URL][jsdelivr-url-files], or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap). 
 ```html
 <script type="module">
 import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or https://cdn.jsdelivr.net/npm/ce-mixinprops@1.x
@@ -40,7 +41,7 @@ import { mixinPropertiesAttributes, propTypes } from 'ce-mixinprops'; // or http
 </script>
 ```
 
-**Use via CommonJS:** with a [dynamic `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) with a local file, CDN URL, or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap).
+**Use via Script:** with a [dynamic `import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import), with a local file, [CDN URL][jsdelivr-url-files], or [module name & import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap).
 ```html
 <script type="text/javascript">
 (async ()=>{
@@ -508,27 +509,7 @@ All help is appreciated. Even if it's just improvements to this readme or the te
 
 ## License
 
-MIT License
-
-Copyright (c) 2023 Jason Sheppard @ https://github.com/Jashepp
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT License, see [LICENSE](./LICENSE) for details.
 
 ## Links
 
@@ -539,8 +520,11 @@ NPM Package: [https://npmjs.org/package/ce-mixinprops][npm-url]
 [github-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes
 [github-releases]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/releases
 [github-tags]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/tags
-[github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml/badge.svg
-[github-tests-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/tests-on-push.yml
+[github-tests-badge]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/run-tests.yml/badge.svg
+[github-tests-url]: https://github.com/Jashepp/customElements-mixinPropertiesAttributes/actions/workflows/run-tests.yml
 [npm-image]: https://img.shields.io/npm/v/ce-mixinprops.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/ce-mixinprops
 [npm-downloads]: https://img.shields.io/npm/dm/ce-mixinprops.svg?style=flat-square
+[jsdelivr-url]: https://www.jsdelivr.com/package/npm/ce-mixinprops
+[jsdelivr-url-files]: https://www.jsdelivr.com/package/npm/ce-mixinprops?tab=files
+[jsdelivr-badge]: https://data.jsdelivr.com/v1/package/npm/ce-mixinprops/badge
