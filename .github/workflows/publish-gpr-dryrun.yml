@@ -1,0 +1,17 @@
+# https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Dry Run - Publish to GitHub Package Registry
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-gpr**.yml'
+  pull_request:
+    paths:
+      - '.github/workflows/publish-gpr**.yml'
+
+jobs:
+
+  publish-gpr:
+    name: Dry Run - Publish to GitHub Package Registry
+    if: ${{ github.event_name != 'release' }}
+    uses: ./.github/workflows/publish-gpr.yml

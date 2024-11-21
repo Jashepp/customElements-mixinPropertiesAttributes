@@ -1,0 +1,81 @@
+# https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: Callee - publish-gpr
+on:
+  workflow_call:
+
+jobs:
+
+  publish-gpr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      
+      # https://github.com/actions/cache/blob/main/examples.md#node---npm
+      - name: Get npm cache directory
+        id: npm-cache-dir-publish
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      
+      # https://github.com/actions/cache/releases
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-publish
+        with:
+          path: ${{ steps.npm-cache-dir-publish.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      
+      # https://github.com/actions/checkout/releases
+      - name: Checkout
+        uses: actions/checkout@v3.6.0
+      
+      # https://github.com/actions/setup-node/tags
+      - uses: actions/setup-node@v3.6.0
+        with:
+          node-version: 18
+          registry-url: https://npm.pkg.github.com/
+          scope: '@Jashepp'
+      
+      - name: Build package-lock
+        run: npm i --package-lock-only
+      
+      # - name: Clean & Install Deps
+      #   run: npm ci
+      
+      # - name: Run Final Tests
+      #   run: npm test
+      
+      # https://github.com/cypress-io/github-action/releases
+      - name: Run Final Tests - Cypress run
+        uses: cypress-io/github-action@v5.0.9
+        with:
+          browser: electron
+          install: true
+          runTests: true
+          start: npm run cypress:workflow
+          wait-on: 'http://localhost:8181'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Publish to GitHub Package Registry - Dry Run
+        if: ${{ github.event_name != 'release' }}
+        run: |
+          npm config set scope "@Jashepp"
+          npm config set @Jashepp:registry https://npm.pkg.github.com/
+          npm pkg set name=@Jashepp/ce-mixinprops
+          npm publish --dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      
+      - name: Publish to GitHub Package Registry
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          npm config set scope "@Jashepp"
+          npm config set @Jashepp:registry https://npm.pkg.github.com/
+          npm pkg set name=@Jashepp/ce-mixinprops
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

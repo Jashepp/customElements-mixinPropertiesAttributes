@@ -1,6 +1,21 @@
 name: Tests
 
-on: [push]
+on:
+  workflow_call:
+  push:
+    paths:
+      - '**.html'
+      - '**.js'
+      - '**.mjs'
+      - '**.json'
+      - '.github/workflows/run-tests.yml'
+  pull_request:
+    paths:
+      - '**.html'
+      - '**.js'
+      - '**.mjs'
+      - '**.json'
+      - '.github/workflows/run-tests.yml'
 
 # https://docs.cypress.io/guides/continuous-integration/github-actions
 jobs:
@@ -38,6 +53,19 @@ jobs:
       image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
+      # Reuse NPM Cache
+      - name: Get npm cache directory
+        id: npm-cache-dir-latestbrowsers
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-latestbrowsers
+        with:
+          path: ${{ steps.npm-cache-dir-latestbrowsers.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      # Continue
       - name: Checkout
         uses: actions/checkout@v3.3.0
       - name: Build package-lock
@@ -60,6 +88,19 @@ jobs:
       image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
+      # Reuse NPM Cache
+      - name: Get npm cache directory
+        id: npm-cache-dir-latestbrowsers
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-latestbrowsers
+        with:
+          path: ${{ steps.npm-cache-dir-latestbrowsers.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      # Continue
       - name: Checkout
         uses: actions/checkout@v3.3.0
       - name: Build package-lock
@@ -82,6 +123,19 @@ jobs:
       image: cypress/browsers:node-22.11.0-chrome-131.0.6778.69-1-ff-132.0.2-edge-131.0.2903.51-1
       options: --user 1001
     steps:
+      # Reuse NPM Cache
+      - name: Get npm cache directory
+        id: npm-cache-dir-latestbrowsers
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-latestbrowsers
+        with:
+          path: ${{ steps.npm-cache-dir-latestbrowsers.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      # Continue
       - name: Checkout
         uses: actions/checkout@v3.3.0
       - name: Build package-lock
@@ -106,6 +160,19 @@ jobs:
       image: cypress/browsers:node16.5.0-chrome94-ff93
       options: --user 1001
     steps:
+      # Reuse NPM Cache
+      - name: Get npm cache directory
+        id: npm-cache-dir-oldbrowsers
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-oldbrowsers
+        with:
+          path: ${{ steps.npm-cache-dir-oldbrowsers.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      # Continue
       - name: Checkout
         uses: actions/checkout@v3.3.0
       - name: Build package-lock
@@ -128,6 +195,19 @@ jobs:
       image: cypress/browsers:node16.5.0-chrome94-ff93
       options: --user 1001
     steps:
+      # Reuse NPM Cache
+      - name: Get npm cache directory
+        id: npm-cache-dir-oldbrowsers
+        shell: bash
+        run: echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}
+      - name: Use cache for npm
+        uses: actions/cache@v3.3.1
+        id: npm-cache-oldbrowsers
+        with:
+          path: ${{ steps.npm-cache-dir-oldbrowsers.outputs.dir }}
+          key: npm-${{ hashFiles('package.json') }}
+          restore-keys: npm-
+      # Continue
       - name: Checkout
         uses: actions/checkout@v3.3.0
       - name: Build package-lock

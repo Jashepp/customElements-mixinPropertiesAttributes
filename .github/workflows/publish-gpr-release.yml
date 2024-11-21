@@ -1,0 +1,19 @@
+# https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
+
+name: On Release - Publish to GitHub Package Registry
+on:
+  release:
+    types: [created]
+
+jobs:
+
+  run-tests:
+    name: Run Tests
+    if: ${{ github.event_name == 'release' }}
+    uses: ./.github/workflows/run-tests.yml
+
+  publish-gpr:
+    name: Publish to GitHub Package Registry
+    if: ${{ github.event_name == 'release' }}
+    needs: run-tests
+    uses: ./.github/workflows/publish-gpr.yml
