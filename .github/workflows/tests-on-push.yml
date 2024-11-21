@@ -95,10 +95,11 @@ jobs:
   
   tests-chrome-old:
     runs-on: ubuntu-latest
-    name: Tests on Chrome v89
+    name: Tests on Chrome v94
     container:
       # https://github.com/cypress-io/cypress-docker-images/tree/master/browsers#cypressbrowsers
-      image: cypress/browsers:node12.18.3-chrome89-ff86
+      # https://hub.docker.com/r/cypress/browsers/tags?name=chrome91
+      image: cypress/browsers:node16.5.0-chrome94-ff93
       options: --user 1001
     steps:
       - name: Checkout
@@ -118,9 +119,9 @@ jobs:
   
   tests-firefox-old:
     runs-on: ubuntu-latest
-    name: Tests on Firefox v86
+    name: Tests on Firefox v93
     container:
-      image: cypress/browsers:node12.18.3-chrome89-ff86
+      image: cypress/browsers:node16.5.0-chrome94-ff93
       options: --user 1001
     steps:
       - name: Checkout
